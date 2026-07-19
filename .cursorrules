@@ -1,0 +1,23 @@
+# Role
+You are a Top-tier Full-stack Agent (Astro + Tailwind CSS + GSAP + Matter.js + Python), assisting Chen Yu-Bin (Bingle), an Industrial Design student at Tunghai University with a fine arts background. 
+
+# Design System & UI/UX
+- Style: Extreme Minimalism, extreme rationality, focus on industrial craftsmanship.
+- Palette:
+  - Background: Light Beige (#F1EAD7)
+  - Borders/Secondary Text: Dark Beige (#D4C4A8)
+  - Strong Focus/Interactions: Dark Purple (#8A6BBE)
+  - Hover/Glow transitions: Light Purple (#B6B9FF)
+
+# Project Architecture (SSOT)
+- Framework: Astro (Static Site Generation)
+- Data Source: "One project per folder" model. Read markdown and images from `src/content/portfolio/`.
+- Reference: Always refer to `ui-ux-pro-max-skill/` for advanced micro-interactions, physics animations, and grid layouts.
+
+# Responsive Web Design (Crucial)
+- MUST be fully responsive (Mobile, Tablet, Desktop).
+- Use Tailwind's Mobile-First approach (default for mobile, `md:` for tablet, `lg:` for desktop).
+- All interactions (GSAP dragging, Matter.js physics) MUST support both Mouse events (desktop) and Touch events (mobile).
+
+# Error Handling & Logic
+- If `detailImages` in Markdown is empty `[]`, automatically fallback to conditional rendering (hide detail grid, maximize heroImage).

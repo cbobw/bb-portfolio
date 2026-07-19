@@ -1,0 +1,216 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+const profiles = await getCollection('profile');
+const bio = profiles[0];
+const { Content } = bio ? await render(bio) : { Content: null };
+
+/** 拆解圖層：對應 biography 結構 */
+const explodeLayers = [
+  {
+    id: 'identity',
+    kicker: '01 / Identity',
+    title: '陳禹賓 / Bingle',
+    body: '工業設計師 & 藝術創作者。在工業設計的幾何秩序中，融入手繪與純藝術的感性靈魂。',
+    meta: 'binglebb@gmail.com',
+  },
+  {
+    id: 'philosophy',
+    kicker: '02 / Philosophy',
+    title: '理性骨架 · 感性皮膚',
+    body: '「設計是物件的理性骨架，而藝術是物質的感性皮膚。」追求極簡，專注微觀細節與工藝觸感。',
+    meta: 'Creative Philosophy',
+  },
+  {
+    id: 'thuid',
+    kicker: '03 / Journey',
+    title: '東海大學工業設計學系',
+    body: '2025 – 至今｜產品外觀、結構驗證與數位建模（Creo / Blender），探索實體工藝與虛實界面。',
+    meta: 'THUID',
+  },
+  {
+    id: 'art',
+    kicker: '04 / Journey',
+    title: '吉吉童畫村',
+    body: '2013 – 2022｜手繪、油畫及複合媒材啟蒙，培養色彩、材質肌理與視覺張力的敏銳度。',
+    meta: 'Fine Art Roots',
+  },
+];
+---
+
+<BaseLayout title="Bingle — 陳禹賓" description="工業設計與純藝術創作者 — 陳禹賓 Bingle">
+  <!-- Hero：幾何微動 -->
+  <section
+    class="relative mb-16 grid min-h-[70dvh] items-center gap-8 overflow-hidden sm:mb-20 sm:min-h-[75dvh] md:mb-24 md:grid-cols-[1.1fr_0.9fr] md:gap-10 lg:mb-28 lg:gap-14"
+    data-hero
+  >
+    <div class="relative z-10 grid gap-4 sm:gap-5 md:gap-6">
+      <p class="text-[10px] uppercase tracking-[0.28em] text-beige-dark sm:text-xs">
+        Industrial Design · Fine Art
+      </p>
+      <h1
+        class="text-3xl font-medium leading-[1.1] tracking-tight text-neutral-900 sm:text-4xl md:text-5xl lg:text-6xl"
+      >
+        Bingle
+      </h1>
+      <p class="max-w-md text-sm leading-relaxed text-neutral-600 sm:text-base md:text-lg">
+        在理性骨架中保留感性肌理。<br class="hidden sm:block" />
+        陳禹賓 — 東海大學工業設計 × 純藝術背景。
+      </p>
+      <a
+        href="#exploded"
+        class="mt-2 inline-flex w-fit items-center gap-2 border-b border-purple-focus pb-0.5 text-xs tracking-[0.16em] text-purple-focus transition-colors hover:text-purple-hover sm:text-sm"
+      >
+        展開歷程
+        <span aria-hidden="true">↓</span>
+      </a>
+    </div>
+
+    <div
+      class="relative mx-auto aspect-square w-full max-w-[320px] sm:max-w-[380px] md:max-w-none"
+      data-geo-stage
+      aria-hidden="true"
+    >
+      <div class="absolute inset-[12%] border border-beige-dark/50"></div>
+      <div class="absolute inset-[22%] border border-dashed border-beige-dark/40"></div>
+      <div
+        data-geo
+        class="absolute left-[18%] top-[20%] h-16 w-16 border border-purple-focus/70 bg-purple-hover/20 sm:h-20 sm:w-20"
+      ></div>
+      <div
+        data-geo
+        class="absolute right-[16%] top-[28%] h-14 w-14 rounded-full border border-beige-dark bg-beige-light sm:h-16 sm:w-16"
+      ></div>
+      <div
+        data-geo
+        class="absolute bottom-[22%] left-[28%] h-0 w-0 border-l-[28px] border-r-[28px] border-b-[48px] border-l-transparent border-r-transparent border-b-purple-focus/50 sm:border-l-[32px] sm:border-r-[32px] sm:border-b-[56px]"
+      ></div>
+      <div
+        data-geo
+        class="absolute bottom-[30%] right-[22%] h-12 w-12 rotate-45 border border-purple-hover/80 sm:h-14 sm:w-14"
+      ></div>
+      <div
+        data-geo
+        class="absolute left-1/2 top-[12%] h-px w-24 -translate-x-1/2 bg-beige-dark sm:w-32"
+      ></div>
+      <div
+        data-geo
+        class="absolute bottom-[14%] left-1/2 h-20 w-px -translate-x-1/2 bg-beige-dark/80 sm:h-24"
+      ></div>
+    </div>
+  </section>
+
+  <!-- 官方作品集 PDF（僅 portfolio + biography，不含 secret-base 等彩蛋） -->
+  <section class="mb-14 border-b border-beige-dark/35 pb-12 sm:mb-16 sm:pb-14 md:mb-20 md:pb-16">
+    <a
+      href="/downloads/bb_profolio_0.0.2.pdf"
+      class="group inline-flex min-h-11 w-full max-w-md items-center justify-center gap-2 border border-beige-dark/70 bg-purple-focus px-6 py-3 text-xs tracking-[0.2em] text-beige-light shadow-[inset_0_0_0_1px_rgba(241,234,215,0.12)] transition-colors hover:border-purple-hover hover:bg-purple-hover hover:text-neutral-900 sm:min-h-12 sm:w-auto sm:px-8 sm:text-sm"
+      download="bb_profolio_0.0.2.pdf"
+    >
+      <span aria-hidden="true">↓</span>
+      <span>下載官方作品集 (PDF)</span>
+    </a>
+    <p class="mt-3 max-w-md text-[10px] leading-relaxed tracking-[0.1em] text-beige-dark sm:text-xs">
+      正式版作品集 · 僅含作品與 biography，不含 secret-base 或實驗頁內容。
+    </p>
+  </section>
+
+  <!-- 拆解圖：滾動組裝 / 手機視差 -->
+  <section id="exploded" class="relative mb-16 sm:mb-20 md:mb-24" data-exploded>
+    <header class="mb-8 grid gap-2 sm:mb-10 md:mb-12">
+      <p class="text-[10px] uppercase tracking-[0.25em] text-beige-dark sm:text-xs">
+        Exploded View
+      </p>
+      <h2 class="text-xl font-medium text-neutral-900 sm:text-2xl md:text-3xl">
+        歷程拆解與組裝
+      </h2>
+      <p class="max-w-xl text-sm text-neutral-600 sm:text-base">
+        <span class="md:hidden">向下滾動，層層視差堆疊。</span>
+        <span class="hidden md:inline">滾動頁面，將離散零件組裝回完整敘事。</span>
+      </p>
+    </header>
+
+    <div
+      data-explode-stage
+      class="relative mx-auto flex min-h-[70dvh] flex-col gap-4 md:block md:min-h-[72dvh] md:max-w-3xl"
+    >
+      {
+        explodeLayers.map((layer, i) => (
+          <article
+            data-explode-layer
+            class="relative border border-beige-dark/50 bg-beige-light/95 p-4 backdrop-blur-sm sm:p-5 md:absolute md:inset-x-0 md:top-1/2 md:w-full md:p-6 lg:p-8"
+            style={`z-index: ${10 + i}`}
+          >
+            <p class="mb-2 text-[10px] uppercase tracking-[0.2em] text-beige-dark sm:text-xs">
+              {layer.kicker}
+            </p>
+            <h3 class="mb-2 text-base font-medium text-neutral-900 sm:text-lg md:text-xl">
+              {layer.title}
+            </h3>
+            <p class="text-sm leading-relaxed text-neutral-600 sm:text-base">{layer.body}</p>
+            <p class="mt-3 text-[10px] uppercase tracking-[0.18em] text-purple-focus sm:text-xs">
+              {layer.meta}
+            </p>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- 完整 biography 文本（無 JS 可讀） -->
+  {
+    Content && (
+      <section class="border-t border-beige-dark/40 pt-10 sm:pt-12 md:pt-14">
+        <p class="mb-4 text-[10px] uppercase tracking-[0.25em] text-beige-dark sm:mb-6 sm:text-xs">
+          Full Biography
+        </p>
+        <div class="prose prose-neutral max-w-none prose-headings:font-medium prose-p:text-sm prose-p:leading-relaxed sm:prose-p:text-base md:max-w-3xl">
+          <Content />
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<script>
+  import { initHeroGeometry } from '../scripts/hero-geometry';
+  import { initExplodedView } from '../scripts/exploded-view';
+
+  const hero = document.querySelector<HTMLElement>('[data-hero]');
+  const geo = document.querySelector<HTMLElement>('[data-geo-stage]');
+  const exploded = document.querySelector<HTMLElement>('[data-exploded]');
+
+  const cleanups: Array<() => void> = [];
+  if (geo) cleanups.push(initHeroGeometry(geo));
+  if (exploded) cleanups.push(initExplodedView(exploded));
+
+  document.addEventListener(
+    'astro:before-swap',
+    () => cleanups.forEach((fn) => fn()),
+    { once: true },
+  );
+</script>
+
+<style>
+  [data-explode-layer] {
+    will-change: transform;
+  }
+
+  @media (min-width: 768px) {
+    [data-explode-stage] {
+      height: min(72dvh, 640px);
+    }
+
+    [data-explode-layer] {
+      box-shadow: 0 0 0 1px color-mix(in srgb, #d4c4a8 35%, transparent);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-geo],
+    [data-explode-layer] {
+      transform: none !important;
+    }
+  }
+</style>

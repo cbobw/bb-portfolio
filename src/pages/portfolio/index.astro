@@ -1,0 +1,192 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+
+const projects = await getCollection('portfolio');
+
+const years = [...new Set(projects.map((p) => p.data.year))].sort();
+const categories = [...new Set(projects.map((p) => p.data.category))].sort();
+
+const yearIndex = Object.fromEntries(years.map((y, i) => [y, i]));
+const categoryIndex = Object.fromEntries(categories.map((c, i) => [c, i]));
+
+const COL_W = 320;
+const ROW_H = 380;
+const GAP_X = 48;
+const GAP_Y = 56;
+const PAD = 120;
+
+const placed = projects.map((project) => {
+  const xi = yearIndex[project.data.year] ?? 0;
+  const yi = categoryIndex[project.data.category] ?? 0;
+  // 同格微偏移避免完全重疊
+  const jitter = (project.id.charCodeAt(project.id.length - 1) % 5) * 12;
+  return {
+    project,
+    x: PAD + xi * (COL_W + GAP_X) + jitter,
+    y: PAD + yi * (ROW_H + GAP_Y) + (jitter % 24),
+  };
+});
+
+const axisYears = years.map((y, i) => ({
+  label: y,
+  x: PAD + i * (COL_W + GAP_X) + COL_W / 2,
+}));
+const axisCats = categories.map((c, i) => ({
+  label: c,
+  y: PAD + i * (ROW_H + GAP_Y) + ROW_H / 2,
+}));
+---
+
+<BaseLayout
+  title="Work — Bingle"
+  description="作品集無限畫布：時間 × 分類"
+  fullBleed
+  hideFooter
+>
+  <div class="canvas-root relative h-[calc(100dvh-3rem)] w-full md:h-[calc(100dvh-3.5rem)] lg:h-[calc(100dvh-4rem)]" data-infinite-canvas>
+    <!-- HUD -->
+    <div
+      class="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-3 p-3 sm:p-4 md:p-5"
+    >
+      <div class="pointer-events-auto grid gap-1 border border-beige-dark/40 bg-beige-light/90 px-3 py-2 backdrop-blur-sm sm:px-4">
+        <p class="text-[10px] uppercase tracking-[0.22em] text-beige-dark sm:text-xs">Canvas</p>
+        <h1 class="text-sm font-medium text-neutral-900 sm:text-base md:text-lg">
+          時間 × 分類
+        </h1>
+        <p class="hidden text-[10px] text-neutral-500 sm:block sm:text-xs">
+          拖曳平移 · 滾輪／捏合縮放 · 長按卡片可重排
+        </p>
+        <p class="text-[10px] text-neutral-500 sm:hidden">雙指縮放 · 滑動平移</p>
+      </div>
+
+      <div class="pointer-events-auto flex gap-1 border border-beige-dark/40 bg-beige-light/90 p-1 backdrop-blur-sm">
+        <button
+          type="button"
+          data-zoom="out"
+          class="flex h-10 w-10 items-center justify-center text-lg text-neutral-700 transition-colors hover:bg-purple-hover/30 hover:text-purple-focus sm:h-11 sm:w-11"
+          aria-label="縮小"
+        >
+          −
+        </button>
+        <button
+          type="button"
+          data-zoom="in"
+          class="flex h-10 w-10 items-center justify-center text-lg text-neutral-700 transition-colors hover:bg-purple-hover/30 hover:text-purple-focus sm:h-11 sm:w-11"
+          aria-label="放大"
+        >
+          +
+        </button>
+      </div>
+    </div>
+
+    <!-- 軸標籤（固定 HUD 提示） -->
+    <div
+      class="pointer-events-none absolute bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-3 z-20 hidden text-[10px] uppercase tracking-[0.18em] text-beige-dark sm:left-4 md:bottom-4 md:block"
+    >
+      X → Year &nbsp;|&nbsp; Y → Category
+    </div>
+
+    <div
+      data-canvas-viewport
+      class="canvas-viewport absolute inset-0 cursor-grab touch-none overscroll-none pb-[4.25rem] md:pb-0"
+    >
+      <div data-canvas-world class="canvas-world absolute left-0 top-0 origin-top-left will-change-transform">
+        <!-- 軸線參考 -->
+        {
+          axisYears.map(({ label, x }) => (
+            <div
+              class="pointer-events-none absolute top-8 -translate-x-1/2 text-[10px] uppercase tracking-[0.2em] text-beige-dark/80"
+              style={`left: ${x}px`}
+            >
+              {label}
+            </div>
+          ))
+        }
+        {
+          axisCats.map(({ label, y }) => (
+            <div
+              class="pointer-events-none absolute left-4 -translate-y-1/2 rotate-[-90deg] text-[10px] uppercase tracking-[0.16em] text-beige-dark/80 origin-left"
+              style={`top: ${y}px`}
+            >
+              {label}
+            </div>
+          ))
+        }
+
+        {
+          placed.map(({ project, x, y }) => (
+            <a
+              href={`/portfolio/${project.id}`}
+              data-canvas-card
+              data-x={x}
+              data-y={y}
+              class="canvas-card group absolute block w-[260px] border border-beige-dark/40 bg-beige-light shadow-sm transition-shadow hover:border-purple-hover/70 hover:shadow-md sm:w-[280px]"
+              style={`width: ${COL_W - 40}px`}
+            >
+              <div data-card-drag class="cursor-grab active:cursor-grabbing">
+                <div class="aspect-[4/5] overflow-hidden bg-beige-dark/10">
+                  <Image
+                    src={project.data.heroImage}
+                    alt={project.data.title}
+                    class="pointer-events-none h-full w-full object-cover"
+                    widths={[320, 480, 640]}
+                    sizes="280px"
+                    loading="lazy"
+                  />
+                </div>
+                <div class="grid gap-1 p-3 sm:p-4">
+                  <span class="text-[10px] uppercase tracking-[0.16em] text-beige-dark">
+                    {project.data.year} · {project.data.category}
+                  </span>
+                  <h2 class="text-sm font-medium text-neutral-900 group-hover:text-purple-focus sm:text-base">
+                    {project.data.title}
+                  </h2>
+                  <p class="text-xs text-neutral-600">{project.data.subtitle}</p>
+                </div>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import { initInfiniteCanvas } from '../../scripts/infinite-canvas';
+
+  const root = document.querySelector<HTMLElement>('[data-infinite-canvas]');
+  const cleanup = root ? initInfiniteCanvas(root) : () => {};
+
+  document.addEventListener('astro:before-swap', () => cleanup(), { once: true });
+</script>
+
+<style>
+  .canvas-viewport.is-panning {
+    cursor: grabbing;
+  }
+
+  .canvas-card.is-dragging {
+    z-index: 50;
+    border-color: #8a6bbe;
+    box-shadow: 0 12px 32px color-mix(in srgb, #8a6bbe 18%, transparent);
+  }
+
+  .canvas-world {
+    width: 2400px;
+    height: 1600px;
+    background-image:
+      linear-gradient(to right, color-mix(in srgb, #d4c4a8 28%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, #d4c4a8 28%, transparent) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+
+  /* 手機底部導覽上方留白已由 pb 處理；隱藏頁尾時仍需安全區 */
+  @media (max-width: 767px) {
+    .canvas-root {
+      height: calc(100dvh - 3rem);
+    }
+  }
+</style>

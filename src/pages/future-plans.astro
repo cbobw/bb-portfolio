@@ -1,0 +1,278 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const plans = [
+  {
+    id: 'P-01',
+    title: 'CMF 材料研究',
+    desc: '建立個人材料樣本庫：金屬陽極、彈性體、紙基複合。',
+    year: '2026',
+  },
+  {
+    id: 'P-02',
+    title: '互動作品集 2.0',
+    desc: '將物理引擎與手勢操作延伸至更多專案敘事介面。',
+    year: '2026',
+  },
+  {
+    id: 'P-03',
+    title: '產品原型工作坊',
+    desc: '從草模 → 結構驗證 → 小批量展示件的完整鏈路。',
+    year: '2027',
+  },
+  {
+    id: 'P-04',
+    title: '跨域聯展',
+    desc: '工業設計 × 純藝術的實體展演，強調工藝觸感。',
+    year: '2027',
+  },
+];
+---
+
+<BaseLayout title="Future Plans — Bingle" description="工程藍圖：Solid / Wireframe 切換">
+  <section class="blueprint-page relative" data-blueprint>
+    <header class="relative z-10 mb-8 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-end sm:justify-between md:mb-12">
+      <div class="grid gap-2 sm:gap-3">
+        <p class="text-[10px] uppercase tracking-[0.25em] text-beige-dark sm:text-xs">
+          Blueprint · <span data-mode-label>Solid</span>
+        </p>
+        <h1 class="text-xl font-medium text-neutral-900 sm:text-2xl md:text-3xl">
+          未來工程藍圖
+        </h1>
+        <p class="max-w-md text-sm text-neutral-600 sm:text-base">
+          One-click 切換 Solid / Wireframe，像在 CAD 視埠裡檢查結構。
+        </p>
+      </div>
+
+      <button
+        type="button"
+        data-mode-toggle
+        class="min-h-11 border border-purple-focus bg-beige-light px-4 py-2 text-xs tracking-[0.14em] text-purple-focus transition-colors hover:bg-purple-hover/25 sm:text-sm"
+        aria-pressed="false"
+      >
+        切換 Wireframe
+      </button>
+    </header>
+
+    <div
+      data-blueprint-stage
+      data-mode="solid"
+      class="blueprint-stage relative z-10 grid gap-4 sm:gap-5 md:grid-cols-2 md:gap-6 lg:gap-8"
+    >
+      <!-- 標題圖框 -->
+      <div class="blueprint-frame md:col-span-2">
+        <div class="blueprint-meta">
+          <span>DWG: BINGLE-FUTURE</span>
+          <span>SCALE 1:1</span>
+          <span>REV A</span>
+        </div>
+        <svg class="blueprint-svg" viewBox="0 0 640 160" aria-hidden="true">
+          <rect class="bp-stroke bp-fill" x="24" y="28" width="200" height="104" />
+          <circle class="bp-stroke bp-fill" cx="320" cy="80" r="48" />
+          <polygon class="bp-stroke bp-fill" points="440,132 520,28 600,132" />
+          <line class="bp-stroke" x1="24" y1="148" x2="616" y2="148" />
+          <line class="bp-dim" x1="24" y1="140" x2="224" y2="140" />
+        </svg>
+      </div>
+
+      {
+        plans.map((plan) => (
+          <article class="blueprint-card">
+            <div class="blueprint-card-head">
+              <span class="blueprint-id">{plan.id}</span>
+              <span class="blueprint-year">{plan.year}</span>
+            </div>
+            <h2 class="blueprint-title">{plan.title}</h2>
+            <p class="blueprint-desc">{plan.desc}</p>
+            <div class="blueprint-corners" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+              <i />
+            </div>
+          </article>
+        ))
+      }
+    </div>
+
+    <nav class="relative z-10 mt-10 flex flex-wrap gap-x-4 gap-y-2 border-t border-beige-dark/40 pt-6 text-xs tracking-[0.12em] text-neutral-500 sm:mt-12 sm:text-sm">
+      <a href="/contact" class="hover:text-purple-focus">← Contact</a>
+      <a href="/secret-base" class="hover:text-purple-focus">Secret Base →</a>
+    </nav>
+  </section>
+</BaseLayout>
+
+<script>
+  import { initBlueprintToggle } from '../scripts/blueprint-toggle';
+
+  const root = document.querySelector<HTMLElement>('[data-blueprint]');
+  const cleanup = root ? initBlueprintToggle(root) : () => {};
+  document.addEventListener('astro:before-swap', () => cleanup(), { once: true });
+</script>
+
+<style>
+  .blueprint-page {
+    isolation: isolate;
+  }
+
+  .blueprint-page::before {
+    content: '';
+    position: absolute;
+    inset: -1.5rem;
+    z-index: 0;
+    pointer-events: none;
+    background-color: #f1ead7;
+    background-image:
+      linear-gradient(color-mix(in srgb, #8a6bbe 14%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, #8a6bbe 14%, transparent) 1px, transparent 1px),
+      linear-gradient(color-mix(in srgb, #d4c4a8 35%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, #d4c4a8 35%, transparent) 1px, transparent 1px);
+    background-size:
+      80px 80px,
+      80px 80px,
+      16px 16px,
+      16px 16px;
+    opacity: 0.55;
+  }
+
+  .blueprint-stage[data-mode='wireframe'] {
+    --bp-fill: transparent;
+    --bp-stroke: #8a6bbe;
+    --bp-card-bg: transparent;
+    --bp-card-border: #8a6bbe;
+    --bp-text: #5c4a7a;
+  }
+
+  .blueprint-stage[data-mode='solid'] {
+    --bp-fill: color-mix(in srgb, #b6b9ff 28%, #f1ead7);
+    --bp-stroke: #d4c4a8;
+    --bp-card-bg: color-mix(in srgb, #f1ead7 92%, #fff);
+    --bp-card-border: #d4c4a8;
+    --bp-text: #2a2a2a;
+  }
+
+  .blueprint-frame {
+    border: 1px solid var(--bp-card-border);
+    background: var(--bp-card-bg);
+    padding: 0.75rem 1rem 1rem;
+    transition:
+      background 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  .blueprint-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.25rem;
+    margin-bottom: 0.5rem;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #a89478;
+  }
+
+  .blueprint-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .bp-stroke {
+    fill: none;
+    stroke: var(--bp-stroke);
+    stroke-width: 1.5;
+    transition:
+      stroke 0.25s ease,
+      fill 0.25s ease;
+  }
+
+  .bp-fill {
+    fill: var(--bp-fill);
+  }
+
+  .bp-dim {
+    fill: none;
+    stroke: #8a6bbe;
+    stroke-width: 1;
+    stroke-dasharray: 4 3;
+  }
+
+  .blueprint-card {
+    position: relative;
+    border: 1px solid var(--bp-card-border);
+    background: var(--bp-card-bg);
+    padding: 1rem 1.1rem 1.25rem;
+    color: var(--bp-text);
+    transition:
+      background 0.25s ease,
+      border-color 0.25s ease,
+      color 0.25s ease;
+  }
+
+  .blueprint-stage[data-mode='wireframe'] .blueprint-card {
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, #b6b9ff 35%, transparent);
+  }
+
+  .blueprint-card-head {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.65rem;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #a89478;
+  }
+
+  .blueprint-title {
+    font-size: 1.05rem;
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+  }
+
+  @media (min-width: 640px) {
+    .blueprint-title {
+      font-size: 1.15rem;
+    }
+  }
+
+  .blueprint-desc {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    opacity: 0.85;
+  }
+
+  .blueprint-corners i {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-color: #8a6bbe;
+    border-style: solid;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .blueprint-stage[data-mode='wireframe'] .blueprint-corners i {
+    opacity: 1;
+  }
+
+  .blueprint-corners i:nth-child(1) {
+    top: 4px;
+    left: 4px;
+    border-width: 1.5px 0 0 1.5px;
+  }
+  .blueprint-corners i:nth-child(2) {
+    top: 4px;
+    right: 4px;
+    border-width: 1.5px 1.5px 0 0;
+  }
+  .blueprint-corners i:nth-child(3) {
+    bottom: 4px;
+    left: 4px;
+    border-width: 0 0 1.5px 1.5px;
+  }
+  .blueprint-corners i:nth-child(4) {
+    bottom: 4px;
+    right: 4px;
+    border-width: 0 1.5px 1.5px 0;
+  }
+</style>

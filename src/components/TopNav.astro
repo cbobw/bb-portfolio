@@ -1,0 +1,79 @@
+---
+interface Props {
+  currentPath?: string;
+}
+
+const { currentPath = Astro.url.pathname } = Astro.props;
+
+const navItems = [
+  { href: '/', label: 'Home', labelZh: '首頁' },
+  { href: '/portfolio', label: 'Work', labelZh: '作品' },
+  { href: '/contact', label: 'Contact', labelZh: '聯絡' },
+  { href: '/about', label: 'About', labelZh: '關於' },
+];
+
+const playItems = [
+  { href: '/future-plans', label: 'Plans' },
+  { href: '/secret-base', label: 'Secret' },
+];
+
+function isActive(href: string): boolean {
+  if (href === '/') return currentPath === '/';
+  return currentPath.startsWith(href);
+}
+---
+
+<header class="border-b border-beige-dark/60 bg-beige-light/95 backdrop-blur-sm">
+  <nav class="grid-container flex h-12 items-center justify-between sm:h-14 lg:h-16" aria-label="主要導覽">
+    <a
+      href="/"
+      class="text-xs font-medium uppercase tracking-[0.2em] text-neutral-800 transition-colors hover:text-purple-focus sm:text-sm"
+    >
+      Bingle
+    </a>
+
+    <div class="hidden items-center gap-6 md:flex lg:gap-10">
+      <ul class="flex items-center gap-6 lg:gap-10">
+        {
+          navItems.map(({ href, label, labelZh }) => (
+            <li>
+              <a
+                href={href}
+                class:list={[
+                  'nav-link relative py-1 text-xs lg:text-sm',
+                  isActive(href) && 'nav-link-active',
+                ]}
+                aria-current={isActive(href) ? 'page' : undefined}
+              >
+                <span class="hidden lg:inline">{label}</span>
+                <span class="lg:hidden">{labelZh}</span>
+                {isActive(href) && (
+                  <span class="absolute inset-x-0 -bottom-1 h-px bg-purple-focus" />
+                )}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <ul class="flex items-center gap-3 border-l border-beige-dark/50 pl-5 lg:gap-4 lg:pl-6">
+        {
+          playItems.map(({ href, label }) => (
+            <li>
+              <a
+                href={href}
+                class:list={[
+                  'text-[10px] uppercase tracking-[0.16em] text-beige-dark transition-colors hover:text-purple-focus lg:text-xs',
+                  isActive(href) && 'text-purple-focus',
+                ]}
+                aria-current={isActive(href) ? 'page' : undefined}
+              >
+                {label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </nav>
+</header>

@@ -1,0 +1,49 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-beige-light: #f1ead7;
+  --color-beige-dark: #d4c4a8;
+  --color-purple-focus: #8a6bbe;
+  --color-purple-hover: #b6b9ff;
+
+  --font-sans: 'IBM Plex Sans', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply min-h-dvh bg-beige-light font-sans text-neutral-800 antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  ::selection {
+    @apply bg-purple-hover/40 text-neutral-900;
+  }
+}
+
+@layer components {
+  .grid-container {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 md:px-8 lg:px-10;
+  }
+
+  .nav-link {
+    @apply text-sm tracking-wide text-neutral-700 transition-colors duration-200;
+  }
+
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    @apply text-purple-focus outline-none;
+  }
+
+  .nav-link-active {
+    @apply text-purple-focus;
+  }
+}

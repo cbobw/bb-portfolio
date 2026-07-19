@@ -1,0 +1,216 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { Image } from 'astro:assets';
+import { getCollection, render } from 'astro:content';
+import { hasDetailImages } from '../../utils/content-images';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('portfolio');
+  return projects.map((project) => ({
+    params: { id: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const showDetails = hasDetailImages(project.data.detailImages);
+---
+
+<BaseLayout
+  title={`${project.data.title} — Bingle`}
+  description={project.data.subtitle}
+>
+  <article class="detail-page" data-detail-page>
+    <!-- 三欄：手機單欄垂直 -->
+    <div
+      class:list={[
+        'grid gap-8 sm:gap-10',
+        'lg:grid-cols-12 lg:gap-8 xl:gap-10',
+      ]}
+    >
+      <!-- Col 1：メタ / 規格 -->
+      <aside class="grid gap-5 sm:gap-6 lg:col-span-3 lg:gap-8">
+        <header class="grid gap-2 border-b border-beige-dark/40 pb-4 sm:gap-3 sm:pb-5">
+          <p class="text-[10px] uppercase tracking-[0.22em] text-beige-dark sm:text-xs">
+            {project.data.category} · {project.data.year} · {project.data.tag}
+          </p>
+          <h1 class="text-xl font-medium text-neutral-900 sm:text-2xl lg:text-2xl xl:text-3xl">
+            {project.data.title}
+          </h1>
+          <p class="text-sm text-neutral-600 sm:text-base">{project.data.subtitle}</p>
+        </header>
+
+        {
+          project.data.specifications.length > 0 && (
+            <dl class="grid gap-3 sm:gap-4">
+              {project.data.specifications.map(({ label, value }) => (
+                <div class="grid gap-1 border-b border-beige-dark/25 pb-3">
+                  <dt class="text-[10px] uppercase tracking-[0.16em] text-beige-dark sm:text-xs">
+                    {label}
+                  </dt>
+                  <dd class="text-sm text-neutral-700 sm:text-base">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          )
+        }
+
+        <a
+          href="/portfolio"
+          class="text-xs tracking-[0.14em] text-purple-focus transition-colors hover:text-purple-hover sm:text-sm"
+        >
+          ← 返回畫布
+        </a>
+      </aside>
+
+      <!-- Col 2：主圖 + 放大鏡 -->
+      <section
+        class:list={[
+          'lg:col-span-5',
+          !showDetails && 'lg:col-span-6',
+        ]}
+      >
+        <figure
+          data-loupe-frame
+          class:list={[
+            'loupe-frame relative overflow-hidden border border-beige-dark/40 bg-beige-dark/10',
+            !showDetails && 'mx-auto max-w-2xl',
+          ]}
+        >
+          <Image
+            src={project.data.heroImage}
+            alt={project.data.title}
+            class:list={[
+              'loupe-img block h-auto w-full object-cover',
+              !showDetails ? 'max-h-[78vh]' : 'aspect-[3/4] object-cover',
+            ]}
+            widths={[640, 960, 1280, 1600, 2400]}
+            sizes="(max-width: 1024px) 100vw, 42vw"
+            loading="eager"
+          />
+          <figcaption
+            class="pointer-events-none absolute bottom-2 right-2 bg-beige-light/80 px-2 py-1 text-[9px] uppercase tracking-[0.14em] text-beige-dark backdrop-blur-sm sm:text-[10px]"
+          >
+            <span class="hidden md:inline">游標放大</span>
+            <span class="md:hidden">雙擊放大 · 捏合縮放</span>
+          </figcaption>
+        </figure>
+      </section>
+
+      <!-- Col 3：論述 + detail（空陣列時隱藏 detail 網格） -->
+      <section
+        class:list={[
+          'grid gap-6 sm:gap-8',
+          showDetails ? 'lg:col-span-4' : 'lg:col-span-3',
+        ]}
+      >
+        {
+          showDetails && (
+            <div class="grid grid-cols-2 gap-2 sm:gap-3">
+              {project.data.detailImages.map((image, i) => (
+                <figure
+                  data-loupe-frame
+                  class="loupe-frame relative overflow-hidden border border-beige-dark/30 bg-beige-dark/10"
+                >
+                  <Image
+                    src={image}
+                    alt={`${project.data.title} detail ${i + 1}`}
+                    class="loupe-img aspect-square w-full object-cover"
+                    widths={[320, 480, 640, 960]}
+                    sizes="(max-width: 1024px) 45vw, 15vw"
+                    loading="lazy"
+                  />
+                </figure>
+              ))}
+            </div>
+          )
+        }
+
+        <div
+          class="prose prose-neutral max-w-none border-t border-beige-dark/40 pt-5 prose-headings:font-medium prose-p:text-sm prose-p:leading-relaxed sm:pt-6 sm:prose-p:text-base lg:border-t-0 lg:pt-0"
+        >
+          <Content />
+        </div>
+      </section>
+    </div>
+  </article>
+</BaseLayout>
+
+<script>
+  import { initImageLoupe } from '../../scripts/image-loupe';
+
+  const page = document.querySelector<HTMLElement>('[data-detail-page]');
+  const cleanup = page ? initImageLoupe(page) : () => {};
+
+  document.addEventListener('astro:before-swap', () => cleanup(), { once: true });
+</script>
+
+<style>
+  .loupe-frame {
+    touch-action: manipulation;
+    cursor: crosshair;
+  }
+
+  .loupe-frame.is-zoomed {
+    touch-action: none;
+    cursor: grab;
+  }
+
+  .loupe-frame.is-loupe-active .loupe-img {
+    opacity: 0.92;
+  }
+
+  .loupe-lens {
+    position: absolute;
+    border-radius: 9999px;
+    border: 1.5px solid #8a6bbe;
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, #b6b9ff 50%, transparent),
+      0 8px 24px color-mix(in srgb, #8a6bbe 20%, transparent);
+    pointer-events: none;
+    opacity: 0;
+    z-index: 5;
+    background-repeat: no-repeat;
+    display: none;
+  }
+
+  @media (pointer: fine) {
+    .loupe-lens {
+      display: block;
+    }
+
+    .loupe-lens.is-visible {
+      opacity: 1;
+    }
+  }
+
+  .loupe-mobile-layer {
+    position: absolute;
+    inset: 0;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-position: center;
+    transform-origin: center center;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 4;
+  }
+
+  .loupe-mobile-layer.is-active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  @media (pointer: fine) {
+    .loupe-mobile-layer {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loupe-lens {
+      display: none !important;
+    }
+  }
+</style>
