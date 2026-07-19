@@ -35,7 +35,9 @@ GTK_BIN = Path(r"C:\Program Files\GTK3-Runtime Win64\bin")
 VERSION_FILE_PATTERN = re.compile(r"^bb_profolio_(?:v)?(\d+)\.(\d+)\.(\d+)\.pdf$", re.I)
 DEFAULT_VERSION = (1, 0, 0)
 
-SITE_URL = "https://binglebb.github.io/my-portfolio/"
+SITE_URL = "https://cbobw.github.io/bb-portfolio/"
+GIT_COMMIT_MSG = "Auto-update: Generate PDF and site content"
+GIT_BRANCH = "main"
 
 
 def version_filename(major: int, minor: int, patch: int) -> str:
@@ -126,22 +128,21 @@ def publish_to_public(source: Path, major: int, minor: int, patch: int) -> Path:
 
 
 def update_index_download_link(major: int, minor: int, patch: int) -> str:
-    """更新 index.astro 下載按鈕 href / download 屬性。"""
+    """更新 index.astro 的 portfolioPdf 常數與 download 屬性。"""
     if not INDEX_ASTRO.is_file():
         raise FileNotFoundError(f"找不到 {INDEX_ASTRO}")
 
-    href = version_download_href(major, minor, patch)
     filename = version_filename(major, minor, patch)
     text = INDEX_ASTRO.read_text(encoding="utf-8")
 
-    new_text, href_count = re.subn(
-        r'href="/downloads/bb_profolio[^"]*\.pdf"',
-        f'href="{href}"',
+    new_text, pdf_count = re.subn(
+        r"const portfolioPdf = 'bb_profolio[^']*\.pdf';",
+        f"const portfolioPdf = '{filename}';",
         text,
         count=1,
     )
-    if href_count == 0:
-        raise RuntimeError("index.astro 中找不到下載按鈕 href，請確認 markup 結構。")
+    if pdf_count == 0:
+        raise RuntimeError("index.astro 中找不到 portfolioPdf 常數，請確認 markup 結構。")
 
     new_text, dl_count = re.subn(
         r'download="bb_profolio[^"]*\.pdf"',
@@ -153,7 +154,7 @@ def update_index_download_link(major: int, minor: int, patch: int) -> str:
         raise RuntimeError("index.astro 中找不到 download 屬性，請確認 markup 結構。")
 
     INDEX_ASTRO.write_text(new_text, encoding="utf-8")
-    return href
+    return filename
 
 
 def ensure_generator() -> Path:
@@ -194,6 +195,90 @@ def run_pdf_generation(output: Path, log: scrolledtext.ScrolledText) -> None:
         raise RuntimeError("PDF 產生失敗，請確認 pdf-generator/.venv 與 GTK3 Runtime。")
     if not output.is_file():
         raise RuntimeError(f"未找到輸出檔：{output}")
+
+
+def find_git() -> str | None:
+    """尋找 git 可執行檔（PATH 或 Windows 預設安裝路徑）。"""
+    found = shutil.which("git")
+    if found:
+        return found
+    for candidate in (
+        r"C:\Program Files\Git\cmd\git.exe",
+        r"C:\Program Files (x86)\Git\cmd\git.exe",
+    ):
+        if Path(candidate).is_file():
+            return candidate
+    return None
+
+
+def run_git(
+    git: str,
+    args: list[str],
+    log: scrolledtext.ScrolledText,
+) -> subprocess.CompletedProcess[str]:
+    cmd = [git, *args]
+    log.insert(tk.END, f"▶ git {' '.join(args)}\n")
+    log.see(tk.END)
+    log.update_idletasks()
+
+    proc = subprocess.run(
+        cmd,
+        cwd=str(ROOT),
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
+    if proc.stdout.strip():
+        log.insert(tk.END, proc.stdout.strip() + "\n")
+    if proc.stderr.strip():
+        log.insert(tk.END, proc.stderr.strip() + "\n")
+    log.see(tk.END)
+    return proc
+
+
+def git_auto_push(log: scrolledtext.ScrolledText) -> tuple[bool, str]:
+    """
+    執行 git add / commit / push。
+    認證依賴本機已設定的 SSH 或 Git Credential Manager。
+    回傳 (成功與否, 訊息)；失敗時不拋出例外。
+    """
+    git = find_git()
+    if not git:
+        return False, "找不到 git 指令，請確認已安裝 Git 並加入 PATH。"
+
+    if not (ROOT / ".git").is_dir():
+        return False, f"找不到 Git repository：{ROOT}"
+
+    try:
+        add_proc = run_git(git, ["add", "."], log)
+        if add_proc.returncode != 0:
+            detail = (add_proc.stderr or add_proc.stdout or "").strip()
+            return False, f"git add 失敗（exit {add_proc.returncode}）\n{detail}"
+
+        status_proc = run_git(git, ["status", "--porcelain"], log)
+        if status_proc.returncode != 0:
+            detail = (status_proc.stderr or status_proc.stdout or "").strip()
+            return False, f"git status 失敗（exit {status_proc.returncode}）\n{detail}"
+
+        if not status_proc.stdout.strip():
+            return True, "無新變更可提交，已略過 commit / push。"
+
+        commit_proc = run_git(git, ["commit", "-m", GIT_COMMIT_MSG], log)
+        if commit_proc.returncode != 0:
+            detail = (commit_proc.stderr or commit_proc.stdout or "").strip()
+            return False, f"git commit 失敗（exit {commit_proc.returncode}）\n{detail}"
+
+        push_proc = run_git(git, ["push", "origin", GIT_BRANCH], log)
+        if push_proc.returncode != 0:
+            detail = (push_proc.stderr or push_proc.stdout or "").strip()
+            return False, f"git push 失敗（exit {push_proc.returncode}）\n{detail}"
+
+        return True, f"已成功推送至 origin/{GIT_BRANCH}。"
+    except OSError as exc:
+        return False, f"Git 執行錯誤：{exc}"
+    except Exception as exc:  # noqa: BLE001 — 避免 GUI 崩潰
+        return False, f"Git 未預期錯誤：{exc}"
 
 
 class PortfolioGenApp:
@@ -421,7 +506,7 @@ class PortfolioGenApp:
         try:
             run_pdf_generation(output, self.log)
             public_copy = publish_to_public(output, major, minor, patch)
-            href = update_index_download_link(major, minor, patch)
+            filename = update_index_download_link(major, minor, patch)
         except Exception as exc:  # noqa: BLE001 — GUI 層提示
             messagebox.showerror("PDF 失敗", str(exc))
             self._status.set("PDF 產生失敗")
@@ -429,15 +514,34 @@ class PortfolioGenApp:
 
         self.log.insert(tk.END, f"\n✓ 已儲存：{output}\n")
         self.log.insert(tk.END, f"✓ 已複製至：{public_copy}\n")
-        self.log.insert(tk.END, f"✓ 已更新 index.astro → {href}\n")
+        self.log.insert(tk.END, f"✓ 已更新 index.astro → {filename}\n")
         self.log.see(tk.END)
-        self._status.set(f"完成 · {filename}")
-        messagebox.showinfo(
-            "完成",
-            f"正式版 PDF 已輸出：\n{output}\n\n"
-            f"網站靜態檔：\n{public_copy}\n\n"
-            f"下載連結已同步：\n{href}",
-        )
+
+        self._status.set(f"正在推送 Git…")
+        self.root.update_idletasks()
+
+        git_ok, git_msg = git_auto_push(self.log)
+        if git_ok:
+            self.log.insert(tk.END, f"✓ Git：{git_msg}\n")
+            self._status.set(f"完成 · {filename} · 已推送")
+            messagebox.showinfo(
+                "完成",
+                f"正式版 PDF 已輸出：\n{output}\n\n"
+                f"網站靜態檔：\n{public_copy}\n\n"
+                f"下載連結已同步：\n{href}\n\n"
+                f"Git：{git_msg}",
+            )
+        else:
+            self.log.insert(tk.END, f"⚠ Git 推送失敗：\n{git_msg}\n")
+            self._status.set(f"PDF 完成 · Git 推送失敗")
+            messagebox.showwarning(
+                "PDF 完成 · Git 推送失敗",
+                f"PDF 與網站檔案已成功更新，但 Git 推送失敗。\n\n"
+                f"詳細訊息：\n{git_msg}\n\n"
+                f"請檢查 SSH / Git Credential Manager 設定後手動推送。",
+            )
+
+        self.log.see(tk.END)
 
     def on_copy_link(self, _event: tk.Event | None = None) -> None:
         self.root.clipboard_clear()

@@ -1,4 +1,6 @@
 ---
+import { stripBase, withBase } from '../utils/site';
+
 interface Props {
   currentPath?: string;
 }
@@ -12,9 +14,11 @@ const navItems = [
   { href: '/about', labelZh: '關於', icon: 'about' },
 ] as const;
 
+const path = stripBase(currentPath);
+
 function isActive(href: string): boolean {
-  if (href === '/') return currentPath === '/';
-  return currentPath.startsWith(href);
+  if (href === '/') return path === '/' || path === '';
+  return path.startsWith(href);
 }
 ---
 
@@ -27,7 +31,7 @@ function isActive(href: string): boolean {
       navItems.map(({ href, labelZh, icon }) => (
         <li>
           <a
-            href={href}
+            href={withBase(href.replace(/^\//, ''))}
             class:list={[
               'flex min-h-11 flex-col items-center gap-1 px-1 py-2.5 text-[10px] tracking-wide transition-colors sm:py-3 sm:text-xs',
               isActive(href)

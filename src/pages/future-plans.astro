@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../utils/site';
 
 const plans = [
   {
@@ -96,8 +97,8 @@ const plans = [
     </div>
 
     <nav class="relative z-10 mt-10 flex flex-wrap gap-x-4 gap-y-2 border-t border-beige-dark/40 pt-6 text-xs tracking-[0.12em] text-neutral-500 sm:mt-12 sm:text-sm">
-      <a href="/contact" class="hover:text-purple-focus">← Contact</a>
-      <a href="/secret-base" class="hover:text-purple-focus">Secret Base →</a>
+      <a href={withBase('contact')} class="hover:text-purple-focus">← Contact</a>
+      <a href={withBase('secret-base')} class="hover:text-purple-focus">Secret Base →</a>
     </nav>
   </section>
 </BaseLayout>

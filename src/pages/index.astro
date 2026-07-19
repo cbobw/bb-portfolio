@@ -1,10 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
+import { withBase } from '../utils/site';
 
 const profiles = await getCollection('profile');
 const bio = profiles[0];
 const { Content } = bio ? await render(bio) : { Content: null };
+
+/** 由 bb-profolio-gen.py 自動更新 */
+const portfolioPdf = 'bb_profolio_0.0.2.pdf';
 
 /** 拆解圖層：對應 biography 結構 */
 const explodeLayers = [
@@ -104,9 +108,9 @@ const explodeLayers = [
   <!-- 官方作品集 PDF（僅 portfolio + biography，不含 secret-base 等彩蛋） -->
   <section class="mb-14 border-b border-beige-dark/35 pb-12 sm:mb-16 sm:pb-14 md:mb-20 md:pb-16">
     <a
-      href="/downloads/bb_profolio_0.0.2.pdf"
+      href={withBase(`downloads/${portfolioPdf}`)}
       class="group inline-flex min-h-11 w-full max-w-md items-center justify-center gap-2 border border-beige-dark/70 bg-purple-focus px-6 py-3 text-xs tracking-[0.2em] text-beige-light shadow-[inset_0_0_0_1px_rgba(241,234,215,0.12)] transition-colors hover:border-purple-hover hover:bg-purple-hover hover:text-neutral-900 sm:min-h-12 sm:w-auto sm:px-8 sm:text-sm"
-      download="bb_profolio_0.0.2.pdf"
+      download={portfolioPdf}
     >
       <span aria-hidden="true">↓</span>
       <span>下載官方作品集 (PDF)</span>

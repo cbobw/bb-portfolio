@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import TopNav from '../components/TopNav.astro';
 import BottomNav from '../components/BottomNav.astro';
+import { withBase } from '../utils/site';
 
 interface Props {
   title?: string;
@@ -29,7 +30,7 @@ const currentPath = Astro.url.pathname;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -58,8 +59,12 @@ const currentPath = Astro.url.pathname;
           <div class="grid-container flex flex-col gap-3 text-[10px] uppercase tracking-[0.18em] text-beige-dark sm:text-xs md:flex-row md:items-center md:justify-between">
             <span>© {new Date().getFullYear()} Chen Yu-Bin</span>
             <div class="flex flex-wrap gap-x-4 gap-y-1">
-              <a href="/future-plans" class="transition-colors hover:text-purple-focus">Plans</a>
-              <a href="/secret-base" class="transition-colors hover:text-purple-focus">Secret</a>
+              <a href={withBase('future-plans')} class="transition-colors hover:text-purple-focus">
+                Plans
+              </a>
+              <a href={withBase('secret-base')} class="transition-colors hover:text-purple-focus">
+                Secret
+              </a>
               <span class="text-beige-dark/70">Industrial Design · Fine Art</span>
             </div>
           </div>

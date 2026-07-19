@@ -1,0 +1,71 @@
+﻿node.exe : npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm help
+ npmrc` for supported config options.
+位於 線路:1 字元:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm warn Unknow...config options.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+> my-portfolio@0.0.1 build
+> astro build
+
+01:23:30 [content] Syncing content
+01:23:30 [content] Astro config changed
+01:23:30 [content] Clearing content store
+01:23:30 [content] Synced content
+01:23:30 [types] Generated 637ms
+01:23:30 [build] output: "static"
+01:23:30 [build] mode: "static"
+01:23:30 [build] directory: C:\Users\bb\Desktop\my-portfolio\dist\
+01:23:30 [build] Collecting build info...
+01:23:30 [build] ??Completed in 680ms.
+01:23:30 [build] Building static entrypoints...
+01:23:31 [vite] ??built in 515ms
+01:23:31 [vite] ??built in 85ms
+01:23:31 [build] Rearranging server assets...
+
+ generating static routes 
+01:23:31   ?? /about/index.html (+14ms) 
+01:23:31   ?? /contact/index.html (+6ms) 
+01:23:31   ?? /future-plans/index.html (+4ms) 
+01:23:31   ?? /portfolio/project-0001/index.html (+7ms) 
+01:23:31   ?? /portfolio/project-0002/index.html (+3ms) 
+01:23:31   ?? /portfolio/project-0003/index.html (+3ms) 
+01:23:31   ?? /portfolio/index.html (+5ms) 
+01:23:31   ?? /secret-base/index.html (+4ms) 
+01:23:31   ?? /index.html (+4ms) 
+01:23:31 ??Completed in 84ms.
+
+ generating optimized images 
+01:23:31   ??/_astro/hero.BvvKASy-_kmglP.webp (before: 329kB, after: 55kB) (+144ms) (1/21)
+01:23:31   ??/_astro/hero.xPaDiwM-_Z2p0C5Y.webp (before: 898kB, after: 47kB) (+157ms) (2/21)
+01:23:31   ??/_astro/hero.BvvKASy-_1eQrLb.webp (before: 329kB, after: 108kB) (+163ms) (3/21)
+01:23:31   ??/_astro/hero.xPaDiwM-_9Wx5M.webp (before: 898kB, after: 91kB) (+203ms) (4/21)
+01:23:31   ??/_astro/hero.BJtDHFsy_Z1LwIEU.webp (before: 12850kB, after: 171kB) (+413ms) (5/21)
+01:23:31   ??/_astro/hero.BvvKASy-_Z1LUbmw.webp (before: 329kB, after: 174kB) (+310ms) (6/21)
+01:23:31   ??/_astro/hero.xPaDiwM-_QIyad.webp (before: 898kB, after: 142kB) (+335ms) (7/21)
+01:23:32   ??/_astro/hero.BJtDHFsy_Z26ILWq.webp (before: 12850kB, after: 387kB) (+501ms) (8/21)
+01:23:32   ??/_astro/hero.BvvKASy-_Z3gHwW.webp (before: 329kB, after: 216kB) (+303ms) (9/21)
+01:23:32   ??/_astro/hero.BvvKASy-_ZI0hBV.webp (before: 329kB, after: 16kB) (+35ms) (10/21)
+01:23:32   ??/_astro/hero.BvvKASy-_Z1VVGaH.webp (before: 329kB, after: 34kB) (+74ms) (11/21)
+01:23:32   ??/_astro/hero.xPaDiwM-_1kwcz5.webp (before: 898kB, after: 202kB) (+420ms) (12/21)
+01:23:32   ??/_astro/hero.BJtDHFsy_Z2eE4ED.webp (before: 12850kB, after: 665kB) (+617ms) (13/21)
+01:23:33   ??/_astro/hero.xPaDiwM-_1PX4Py.webp (before: 898kB, after: 383kB) (+746ms) (14/21)
+01:23:33   ??/_astro/hero.BJtDHFsy_21euOz.webp (before: 12850kB, after: 988kB) (+739ms) (15/21)
+01:23:33   ??/_astro/hero.xPaDiwM-_Z5a6HU.webp (before: 898kB, after: 423kB) (+718ms) (16/21)
+01:23:33   ??/_astro/hero.xPaDiwM-_Z26PFEy.webp (before: 898kB, after: 15kB) (+47ms) (17/21)
+01:23:33   ??/_astro/hero.xPaDiwM-_Z11KL34.webp (before: 898kB, after: 28kB) (+61ms) (18/21)
+01:23:34   ??/_astro/hero.BJtDHFsy_BxrvF.webp (before: 12850kB, after: 1536kB) (+1.06s) (19/21)
+01:23:34   ??/_astro/hero.BJtDHFsy_ZXesj1.webp (before: 12850kB, after: 36kB) (+215ms) (20/21)
+01:23:35   ??/_astro/hero.BJtDHFsy_Z1SAG5q.webp (before: 12850kB, after: 90kB) (+238ms) (21/21)
+01:23:35 ??Completed in 3.79s.
+
+01:23:35 [build] ??Completed in 4.55s.
+01:23:35 [build] 9 page(s) built in 5.24s
+01:23:35 [build] Complete!
+npm notice
+npm notice New major version of npm available! 11.16.0 -> 12.0.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.0.1
+npm notice To update run: npm install -g npm@12.0.1
+npm notice

@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
+import { withBase } from '../../utils/site';
 
 const projects = await getCollection('portfolio');
 
@@ -118,7 +119,7 @@ const axisCats = categories.map((c, i) => ({
         {
           placed.map(({ project, x, y }) => (
             <a
-              href={`/portfolio/${project.id}`}
+              href={withBase(`portfolio/${project.id}`)}
               data-canvas-card
               data-x={x}
               data-y={y}
