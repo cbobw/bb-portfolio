@@ -11,6 +11,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 import tkinter as tk
 from datetime import datetime
 from pathlib import Path
@@ -45,6 +46,8 @@ DEFAULT_VERSION = (1, 0, 0)
 SITE_URL = "https://cbobw.github.io/bb-portfolio/"
 GIT_COMMIT_MSG = "Auto-update: Generate PDF and site content"
 GIT_BRANCH = "main"
+GIT_PUSH_ATTEMPTS = 3
+GIT_HTTP_POST_BUFFER = "524288000"
 
 
 def version_filename(major: int, minor: int, patch: int) -> str:
@@ -132,6 +135,28 @@ def publish_to_public(source: Path, major: int, minor: int, patch: int) -> Path:
     dest = PUBLIC_DOWNLOADS_DIR / version_filename(major, minor, patch)
     shutil.copy2(source, dest)
     return dest
+
+
+def prune_old_public_pdfs(keep_filename: str) -> list[str]:
+    """移除 public/downloads/ 內舊版 PDF，降低 push 體積。"""
+    removed: list[str] = []
+    if not PUBLIC_DOWNLOADS_DIR.is_dir():
+        return removed
+
+    for pdf in PUBLIC_DOWNLOADS_DIR.glob("bb_profolio*.pdf"):
+        if pdf.name == keep_filename:
+            continue
+        pdf.unlink(missing_ok=True)
+        removed.append(str(pdf.relative_to(ROOT)))
+    return removed
+
+
+def git_paths_for_release(pdf_filename: str) -> list[str]:
+    """僅提交與 PDF 發布相關的檔案，避免 __pycache__ 等雜項。"""
+    return [
+        str(INDEX_ASTRO.relative_to(ROOT)),
+        str((PUBLIC_DOWNLOADS_DIR / pdf_filename).relative_to(ROOT)),
+    ]
 
 
 PORTFOLIO_PDF_CONST_PATTERN = re.compile(
@@ -237,15 +262,22 @@ def run_git(
     git: str,
     args: list[str],
     log: scrolledtext.ScrolledText,
+    *,
+    extra_env: dict[str, str] | None = None,
 ) -> subprocess.CompletedProcess[str]:
     cmd = [git, *args]
     log.insert(tk.END, f"▶ git {' '.join(args)}\n")
     log.see(tk.END)
     log.update_idletasks()
 
+    env = os.environ.copy()
+    if extra_env:
+        env.update(extra_env)
+
     proc = subprocess.run(
         cmd,
         cwd=str(ROOT),
+        env=env,
         capture_output=True,
         text=True,
         encoding="utf-8",
@@ -259,9 +291,43 @@ def run_git(
     return proc
 
 
-def git_auto_push(log: scrolledtext.ScrolledText) -> tuple[bool, str]:
+def git_push_origin(
+    git: str,
+    log: scrolledtext.ScrolledText,
+) -> subprocess.CompletedProcess[str]:
+    """推送至 origin；大檔 PDF 需提高 HTTP buffer 並允許重試。"""
+    push_args = [
+        "-c",
+        f"http.postBuffer={GIT_HTTP_POST_BUFFER}",
+        "-c",
+        "http.version=HTTP/1.1",
+        "push",
+        "origin",
+        GIT_BRANCH,
+    ]
+    last_proc: subprocess.CompletedProcess[str] | None = None
+
+    for attempt in range(1, GIT_PUSH_ATTEMPTS + 1):
+        if attempt > 1:
+            log.insert(tk.END, f"⚠ push 第 {attempt - 1} 次失敗，{2 * attempt} 秒後重試…\n")
+            log.see(tk.END)
+            time.sleep(2 * attempt)
+
+        last_proc = run_git(git, push_args, log)
+        if last_proc.returncode == 0:
+            return last_proc
+
+    assert last_proc is not None
+    return last_proc
+
+
+def git_auto_push(
+    log: scrolledtext.ScrolledText,
+    *,
+    pdf_filename: str,
+) -> tuple[bool, str]:
     """
-    執行 git add / commit / push。
+    執行 git add / commit / push（僅發布相關檔案）。
     認證依賴本機已設定的 SSH 或 Git Credential Manager。
     回傳 (成功與否, 訊息)；失敗時不拋出例外。
     """
@@ -273,7 +339,15 @@ def git_auto_push(log: scrolledtext.ScrolledText) -> tuple[bool, str]:
         return False, f"找不到 Git repository：{ROOT}"
 
     try:
-        add_proc = run_git(git, ["add", "."], log)
+        removed_pdfs = prune_old_public_pdfs(pdf_filename)
+        for rel_path in removed_pdfs:
+            rm_proc = run_git(git, ["rm", "-f", "--ignore-unmatch", rel_path], log)
+            if rm_proc.returncode != 0:
+                detail = (rm_proc.stderr or rm_proc.stdout or "").strip()
+                return False, f"git rm 失敗（exit {rm_proc.returncode}）\n{detail}"
+
+        paths = git_paths_for_release(pdf_filename)
+        add_proc = run_git(git, ["add", "--", *paths], log)
         if add_proc.returncode != 0:
             detail = (add_proc.stderr or add_proc.stdout or "").strip()
             return False, f"git add 失敗（exit {add_proc.returncode}）\n{detail}"
@@ -291,10 +365,15 @@ def git_auto_push(log: scrolledtext.ScrolledText) -> tuple[bool, str]:
             detail = (commit_proc.stderr or commit_proc.stdout or "").strip()
             return False, f"git commit 失敗（exit {commit_proc.returncode}）\n{detail}"
 
-        push_proc = run_git(git, ["push", "origin", GIT_BRANCH], log)
+        push_proc = git_push_origin(git, log)
         if push_proc.returncode != 0:
             detail = (push_proc.stderr or push_proc.stdout or "").strip()
-            return False, f"git push 失敗（exit {push_proc.returncode}）\n{detail}"
+            return False, (
+                f"git push 失敗（exit {push_proc.returncode}，已重試 {GIT_PUSH_ATTEMPTS} 次）\n"
+                f"{detail}\n\n"
+                "大檔 PDF 推送可能因網路逾時失敗，請稍後手動執行：\n"
+                f"git -c http.postBuffer={GIT_HTTP_POST_BUFFER} push origin {GIT_BRANCH}"
+            )
 
         return True, f"已成功推送至 origin/{GIT_BRANCH}。"
     except OSError as exc:
@@ -529,6 +608,7 @@ class PortfolioGenApp:
             run_pdf_generation(output, self.log)
             public_copy = publish_to_public(output, major, minor, patch)
             filename = update_index_download_link(major, minor, patch)
+            prune_old_public_pdfs(filename)
         except Exception as exc:  # noqa: BLE001 — GUI 層提示
             messagebox.showerror("PDF 失敗", str(exc))
             self._status.set("PDF 產生失敗")
@@ -542,7 +622,7 @@ class PortfolioGenApp:
         self._status.set(f"正在推送 Git…")
         self.root.update_idletasks()
 
-        git_ok, git_msg = git_auto_push(self.log)
+        git_ok, git_msg = git_auto_push(self.log, pdf_filename=filename)
         if git_ok:
             self.log.insert(tk.END, f"✓ Git：{git_msg}\n")
             self._status.set(f"完成 · {filename} · 已推送")

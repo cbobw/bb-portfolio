@@ -30,3 +30,7 @@ pdf-generator/.venv/
 pdf-generator/output/
 pdf-generator/__pycache__/
 profolio-pdf/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
