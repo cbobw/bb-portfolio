@@ -16,6 +16,13 @@ from datetime import datetime
 from pathlib import Path
 from tkinter import messagebox, scrolledtext
 
+try:
+    from bs4 import BeautifulSoup
+except ImportError as exc:
+    raise SystemExit(
+        "缺少 beautifulsoup4，請執行：pip install beautifulsoup4"
+    ) from exc
+
 # —— 品牌色 ——
 BG = "#F1EAD7"
 BORDER = "#D4C4A8"
@@ -127,31 +134,46 @@ def publish_to_public(source: Path, major: int, minor: int, patch: int) -> Path:
     return dest
 
 
+PORTFOLIO_PDF_CONST_PATTERN = re.compile(
+    r"const portfolioPdf = 'bb_profolio[^']*\.pdf';"
+)
+PORTFOLIO_PDF_ANCHOR_ID = "portfolio-pdf-download"
+
+
+def find_portfolio_pdf_anchor(text: str):
+    """以 BeautifulSoup 定位官方 PDF 下載連結（#portfolio-pdf-download）。"""
+    soup = BeautifulSoup(text, "html.parser")
+    anchor = soup.find("a", id=PORTFOLIO_PDF_ANCHOR_ID)
+    if anchor is None:
+        anchor = soup.find("a", class_="portfolio-pdf-download")
+    return anchor
+
+
 def update_index_download_link(major: int, minor: int, patch: int) -> str:
-    """更新 index.astro 的 portfolioPdf 常數與 download 屬性。"""
+    """更新 index.astro 的 portfolioPdf 常數，並驗證下載連結 markup。"""
     if not INDEX_ASTRO.is_file():
         raise FileNotFoundError(f"找不到 {INDEX_ASTRO}")
 
     filename = version_filename(major, minor, patch)
     text = INDEX_ASTRO.read_text(encoding="utf-8")
 
-    new_text, pdf_count = re.subn(
-        r"const portfolioPdf = 'bb_profolio[^']*\.pdf';",
+    anchor = find_portfolio_pdf_anchor(text)
+    if anchor is None:
+        raise RuntimeError(
+            f"index.astro 中找不到 #{PORTFOLIO_PDF_ANCHOR_ID} 下載連結，"
+            "請確認 markup 結構。"
+        )
+
+    if not PORTFOLIO_PDF_CONST_PATTERN.search(text):
+        raise RuntimeError(
+            "index.astro 中找不到 portfolioPdf 常數，請確認 markup 結構。"
+        )
+
+    new_text = PORTFOLIO_PDF_CONST_PATTERN.sub(
         f"const portfolioPdf = '{filename}';",
         text,
         count=1,
     )
-    if pdf_count == 0:
-        raise RuntimeError("index.astro 中找不到 portfolioPdf 常數，請確認 markup 結構。")
-
-    new_text, dl_count = re.subn(
-        r'download="bb_profolio[^"]*\.pdf"',
-        f'download="{filename}"',
-        new_text,
-        count=1,
-    )
-    if dl_count == 0:
-        raise RuntimeError("index.astro 中找不到 download 屬性，請確認 markup 結構。")
 
     INDEX_ASTRO.write_text(new_text, encoding="utf-8")
     return filename
@@ -528,7 +550,7 @@ class PortfolioGenApp:
                 "完成",
                 f"正式版 PDF 已輸出：\n{output}\n\n"
                 f"網站靜態檔：\n{public_copy}\n\n"
-                f"下載連結已同步：\n{href}\n\n"
+                f"下載連結已同步：\n{version_download_href(major, minor, patch)}\n\n"
                 f"Git：{git_msg}",
             )
         else:
