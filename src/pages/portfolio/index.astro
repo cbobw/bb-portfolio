@@ -4,260 +4,190 @@ import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import { withBase } from '../../utils/site';
 
-const projects = (await getCollection('portfolio')).sort((a, b) => {
-  const yearCmp = b.data.year.localeCompare(a.data.year);
-  if (yearCmp !== 0) return yearCmp;
-  return a.data.title.localeCompare(b.data.title, 'zh-Hant');
+const projects = await getCollection('portfolio');
+
+const years = [...new Set(projects.map((p) => p.data.year))].sort();
+const categories = [...new Set(projects.map((p) => p.data.category))].sort();
+
+const yearIndex = Object.fromEntries(years.map((y, i) => [y, i]));
+const categoryIndex = Object.fromEntries(categories.map((c, i) => [c, i]));
+
+const COL_W = 320;
+const ROW_H = 380;
+const GAP_X = 48;
+const GAP_Y = 56;
+const PAD = 120;
+
+const placed = projects.map((project) => {
+  const xi = yearIndex[project.data.year] ?? 0;
+  const yi = categoryIndex[project.data.category] ?? 0;
+  // 同格微偏移避免完全重疊
+  const jitter = (project.id.charCodeAt(project.id.length - 1) % 5) * 12;
+  return {
+    project,
+    x: PAD + xi * (COL_W + GAP_X) + jitter,
+    y: PAD + yi * (ROW_H + GAP_Y) + (jitter % 24),
+  };
 });
 
-const categories = ['all', ...[...new Set(projects.map((p) => p.data.category))].sort()];
-const total = projects.length;
+const axisYears = years.map((y, i) => ({
+  label: y,
+  x: PAD + i * (COL_W + GAP_X) + COL_W / 2,
+}));
+const axisCats = categories.map((c, i) => ({
+  label: c,
+  y: PAD + i * (ROW_H + GAP_Y) + ROW_H / 2,
+}));
 ---
 
 <BaseLayout
   title="Work — Bingle"
-  description="作品圖板目錄 — 陳禹賓 Bingle 工業設計與純藝術作品"
+  description="作品集無限畫布：時間 × 分類"
+  fullBleed
+  hideFooter
 >
-  <div data-plate-catalog class="plate-catalog -mx-4 sm:-mx-6 md:-mx-8 lg:-mx-10">
-    <!-- ========== 目錄抬頭 ========== -->
-    <header class="relative overflow-hidden border-b border-beige-dark/40 px-4 pb-10 pt-6 sm:px-6 sm:pb-12 sm:pt-8 md:px-8 lg:px-10">
-      <div
-        class="pointer-events-none absolute inset-0 opacity-30"
-        aria-hidden="true"
-        style="background-image:
-          linear-gradient(to right, color-mix(in srgb, #d4c4a8 50%, transparent) 1px, transparent 1px),
-          linear-gradient(to bottom, color-mix(in srgb, #d4c4a8 50%, transparent) 1px, transparent 1px);
-          background-size: 40px 40px;"
-      ></div>
-
-      <div class="relative z-10 grid gap-8 md:grid-cols-[1.2fr_0.8fr] md:items-end md:gap-12">
-        <div class="grid gap-4 sm:gap-5">
-          <p class="font-mono text-[10px] uppercase tracking-[0.28em] text-beige-dark sm:text-xs">
-            Catalog · Index
-          </p>
-          <h1 class="font-display text-[clamp(2.75rem,12vw,7.5rem)] font-semibold leading-[0.88] tracking-[-0.04em] text-neutral-900">
-            WORK
-          </h1>
-          <p class="max-w-md text-sm leading-relaxed text-neutral-600 sm:text-base">
-            圖板目錄 — 以工程製圖的編排邏輯，呈列工業設計與純藝術實驗。
-          </p>
-        </div>
-
-        <div class="flex flex-col items-start gap-2 md:items-end">
-          <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-beige-dark sm:text-xs">
-            Plates
-          </p>
-          <p class="font-display text-5xl font-semibold tracking-tight text-purple-focus sm:text-6xl md:text-7xl">
-            <span data-filter-count>{String(total).padStart(2, '0')}</span>
-          </p>
-        </div>
+  <div class="canvas-root relative h-[calc(100dvh-3rem)] w-full md:h-[calc(100dvh-3.5rem)] lg:h-[calc(100dvh-4rem)]" data-infinite-canvas>
+    <!-- HUD -->
+    <div
+      class="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-3 p-3 sm:p-4 md:p-5"
+    >
+      <div class="pointer-events-auto grid gap-1 border border-beige-dark/40 bg-beige-light/90 px-3 py-2 backdrop-blur-sm sm:px-4">
+        <p class="text-[10px] uppercase tracking-[0.22em] text-beige-dark sm:text-xs">Canvas</p>
+        <h1 class="text-sm font-medium text-neutral-900 sm:text-base md:text-lg">
+          時間 × 分類
+        </h1>
+        <p class="hidden text-[10px] text-neutral-500 sm:block sm:text-xs">
+          拖曳平移 · 滾輪／捏合縮放 · 長按卡片可重排
+        </p>
+        <p class="text-[10px] text-neutral-500 sm:hidden">雙指縮放 · 滑動平移</p>
       </div>
 
-      <!-- 篩選 -->
-      <div
-        class="relative z-10 mt-8 flex flex-wrap gap-2 sm:mt-10"
-        role="group"
-        aria-label="依分類篩選"
-      >
+      <div class="pointer-events-auto flex gap-1 border border-beige-dark/40 bg-beige-light/90 p-1 backdrop-blur-sm">
+        <button
+          type="button"
+          data-zoom="out"
+          class="flex h-10 w-10 items-center justify-center text-lg text-neutral-700 transition-colors hover:bg-purple-hover/30 hover:text-purple-focus sm:h-11 sm:w-11"
+          aria-label="縮小"
+        >
+          −
+        </button>
+        <button
+          type="button"
+          data-zoom="in"
+          class="flex h-10 w-10 items-center justify-center text-lg text-neutral-700 transition-colors hover:bg-purple-hover/30 hover:text-purple-focus sm:h-11 sm:w-11"
+          aria-label="放大"
+        >
+          +
+        </button>
+      </div>
+    </div>
+
+    <!-- 軸標籤（固定 HUD 提示） -->
+    <div
+      class="pointer-events-none absolute bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-3 z-20 hidden text-[10px] uppercase tracking-[0.18em] text-beige-dark sm:left-4 md:bottom-4 md:block"
+    >
+      X → Year &nbsp;|&nbsp; Y → Category
+    </div>
+
+    <div
+      data-canvas-viewport
+      class="canvas-viewport absolute inset-0 cursor-grab touch-none overscroll-none pb-[4.25rem] md:pb-0"
+    >
+      <div data-canvas-world class="canvas-world absolute left-0 top-0 origin-top-left will-change-transform">
+        <!-- 軸線參考 -->
         {
-          categories.map((cat) => (
-            <button
-              type="button"
-              data-filter={cat}
-              aria-pressed={cat === 'all' ? 'true' : 'false'}
-              class:list={[
-                'filter-chip inline-flex min-h-10 items-center border px-3 font-mono text-[10px] uppercase tracking-[0.16em] transition-colors sm:min-h-11 sm:px-4 sm:text-xs',
-                cat === 'all' && 'is-active',
-              ]}
+          axisYears.map(({ label, x }) => (
+            <div
+              class="pointer-events-none absolute top-8 -translate-x-1/2 text-[10px] uppercase tracking-[0.2em] text-beige-dark/80"
+              style={`left: ${x}px`}
             >
-              {cat === 'all' ? 'All' : cat}
-            </button>
+              {label}
+            </div>
+          ))
+        }
+        {
+          axisCats.map(({ label, y }) => (
+            <div
+              class="pointer-events-none absolute left-4 -translate-y-1/2 rotate-[-90deg] text-[10px] uppercase tracking-[0.16em] text-beige-dark/80 origin-left"
+              style={`top: ${y}px`}
+            >
+              {label}
+            </div>
+          ))
+        }
+
+        {
+          placed.map(({ project, x, y }) => (
+            <a
+              href={withBase(`portfolio/${project.id}`)}
+              data-canvas-card
+              data-x={x}
+              data-y={y}
+              class="canvas-card group absolute block w-[260px] border border-beige-dark/40 bg-beige-light shadow-sm transition-shadow hover:border-purple-hover/70 hover:shadow-md sm:w-[280px]"
+              style={`width: ${COL_W - 40}px`}
+            >
+              <div data-card-drag class="cursor-grab active:cursor-grabbing">
+                <div class="aspect-[4/5] overflow-hidden bg-beige-dark/10">
+                  <Image
+                    src={project.data.heroImage}
+                    alt={project.data.title}
+                    class="pointer-events-none h-full w-full object-cover"
+                    widths={[320, 480, 640]}
+                    sizes="280px"
+                    loading="lazy"
+                  />
+                </div>
+                <div class="grid gap-1 p-3 sm:p-4">
+                  <span class="text-[10px] uppercase tracking-[0.16em] text-beige-dark">
+                    {project.data.year} · {project.data.category}
+                  </span>
+                  <h2 class="text-sm font-medium text-neutral-900 group-hover:text-purple-focus sm:text-base">
+                    {project.data.title}
+                  </h2>
+                  <p class="text-xs text-neutral-600">{project.data.subtitle}</p>
+                </div>
+              </div>
+            </a>
           ))
         }
       </div>
-    </header>
-
-    <!-- ========== 圖板列表 ========== -->
-    <div class="px-4 py-10 sm:px-6 sm:py-12 md:px-8 md:py-16 lg:px-10">
-      <ul class="grid gap-12 sm:gap-16 md:gap-20 lg:gap-24" role="list">
-        {
-          projects.map((project, i) => {
-            const index = String(i + 1).padStart(2, '0');
-            const odd = i % 2 === 1;
-
-            return (
-              <li
-                data-catalog-plate
-                data-category={project.data.category}
-                class="catalog-plate"
-              >
-                <a
-                  href={withBase(`portfolio/${project.id}`)}
-                  class:list={[
-                    'group grid items-stretch gap-5 sm:gap-6 md:gap-10 lg:gap-14',
-                    'md:grid-cols-12',
-                  ]}
-                >
-                  {/* 圖面 */}
-                  <div
-                    data-magnet
-                    class:list={[
-                      'relative overflow-hidden border border-beige-dark/50 bg-beige-dark/10 will-change-transform md:col-span-7',
-                      odd && 'md:col-start-6',
-                    ]}
-                  >
-                    <div class="aspect-[4/5] overflow-hidden sm:aspect-[5/6] lg:aspect-[4/5]">
-                      <div data-catalog-img class="h-[115%] w-full will-change-transform">
-                        <Image
-                          src={project.data.heroImage}
-                          alt={project.data.title}
-                          class="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                          widths={[480, 720, 960, 1280]}
-                          sizes="(max-width: 768px) 100vw, 58vw"
-                          loading={i < 2 ? 'eager' : 'lazy'}
-                        />
-                      </div>
-                    </div>
-
-                    {/* 工程角標 */}
-                    <span
-                      class="pointer-events-none absolute left-0 top-0 h-6 w-6 border-l-2 border-t-2 border-purple-focus/80 sm:h-8 sm:w-8"
-                      aria-hidden="true"
-                    />
-                    <span
-                      class="pointer-events-none absolute bottom-0 right-0 h-6 w-6 border-b-2 border-r-2 border-purple-focus/80 sm:h-8 sm:w-8"
-                      aria-hidden="true"
-                    />
-
-                    <span
-                      class="pointer-events-none absolute bottom-3 right-3 font-display text-4xl font-semibold leading-none text-beige-light/85 mix-blend-difference sm:bottom-4 sm:right-4 sm:text-5xl md:text-6xl"
-                      aria-hidden="true"
-                    >
-                      {index}
-                    </span>
-                  </div>
-
-                  {/* 規格文字 */}
-                  <div
-                    class:list={[
-                      'flex flex-col justify-center gap-3 sm:gap-4 md:col-span-5',
-                      odd ? 'md:col-start-1 md:row-start-1 md:text-right' : '',
-                    ]}
-                  >
-                    <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-beige-dark sm:text-xs">
-                      Plate {index}
-                      <span class="mx-2 text-beige-dark/50" aria-hidden="true">
-                        /
-                      </span>
-                      {project.data.year}
-                    </p>
-
-                    <h2 class="font-display text-2xl font-medium tracking-tight text-neutral-900 transition-colors group-hover:text-purple-focus sm:text-3xl md:text-4xl lg:text-[2.75rem]">
-                      {project.data.title}
-                    </h2>
-
-                    <p class="text-sm text-neutral-600 sm:text-base">{project.data.subtitle}</p>
-
-                    <dl
-                      class:list={[
-                        'mt-2 grid gap-2 border-t border-beige-dark/40 pt-4 font-mono text-[10px] uppercase tracking-[0.14em] text-beige-dark sm:text-xs',
-                        odd && 'md:ml-auto md:text-right',
-                      ]}
-                    >
-                      <div class:list={['flex gap-3', odd && 'md:flex-row-reverse']}>
-                        <dt class="text-beige-dark/70">Category</dt>
-                        <dd class="text-neutral-700">{project.data.category}</dd>
-                      </div>
-                      <div class:list={['flex gap-3', odd && 'md:flex-row-reverse']}>
-                        <dt class="text-beige-dark/70">Tag</dt>
-                        <dd class="text-neutral-700">{project.data.tag}</dd>
-                      </div>
-                    </dl>
-
-                    <span
-                      class:list={[
-                        'mt-3 inline-flex min-h-11 w-fit items-center gap-2 text-xs tracking-[0.16em] text-purple-focus sm:text-sm',
-                        odd && 'md:ml-auto',
-                      ]}
-                    >
-                      Open plate
-                      <span
-                        class="transition-transform duration-300 group-hover:translate-x-1"
-                        aria-hidden="true"
-                      >
-                        →
-                      </span>
-                    </span>
-                  </div>
-                </a>
-              </li>
-            );
-          })
-        }
-      </ul>
-
-      {
-        projects.length === 0 && (
-          <p class="py-20 text-center font-mono text-xs tracking-[0.18em] text-beige-dark">
-            No plates yet.
-          </p>
-        )
-      }
     </div>
-
-    <!-- 底欄指引 -->
-    <aside class="border-t border-beige-dark/40 px-4 py-8 sm:px-6 md:px-8 lg:px-10">
-      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p class="font-mono text-[10px] uppercase tracking-[0.2em] text-beige-dark sm:text-xs">
-          End of catalog · {String(total).padStart(2, '0')} plates
-        </p>
-        <a
-          href={withBase('')}
-          class="font-mono text-[10px] uppercase tracking-[0.18em] text-purple-focus transition-colors hover:text-purple-hover sm:text-xs"
-        >
-          ← Back to identity
-        </a>
-      </div>
-    </aside>
   </div>
 </BaseLayout>
 
 <script>
-  import { initPlateCatalog } from '../../scripts/plate-catalog';
+  import { initInfiniteCanvas } from '../../scripts/infinite-canvas';
 
-  const root = document.querySelector<HTMLElement>('[data-plate-catalog]');
-  const cleanup = root ? initPlateCatalog(root) : () => {};
+  const root = document.querySelector<HTMLElement>('[data-infinite-canvas]');
+  const cleanup = root ? initInfiniteCanvas(root) : () => {};
 
   document.addEventListener('astro:before-swap', () => cleanup(), { once: true });
 </script>
 
 <style>
-  .filter-chip {
-    border-color: color-mix(in srgb, #d4c4a8 70%, transparent);
-    color: #737373;
-    background: transparent;
+  .canvas-viewport.is-panning {
+    cursor: grabbing;
   }
 
-  .filter-chip:hover {
+  .canvas-card.is-dragging {
+    z-index: 50;
     border-color: #8a6bbe;
-    color: #8a6bbe;
+    box-shadow: 0 12px 32px color-mix(in srgb, #8a6bbe 18%, transparent);
   }
 
-  .filter-chip.is-active {
-    border-color: #8a6bbe;
-    background: #8a6bbe;
-    color: #f1ead7;
+  .canvas-world {
+    width: 2400px;
+    height: 1600px;
+    background-image:
+      linear-gradient(to right, color-mix(in srgb, #d4c4a8 28%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in srgb, #d4c4a8 28%, transparent) 1px, transparent 1px);
+    background-size: 80px 80px;
   }
 
-  .catalog-plate.is-hidden {
-    display: none;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    [data-catalog-img],
-    [data-magnet] {
-      transform: none !important;
-      will-change: auto;
+  /* 手機底部導覽上方留白已由 pb 處理；隱藏頁尾時仍需安全區 */
+  @media (max-width: 767px) {
+    .canvas-root {
+      height: calc(100dvh - 3rem);
     }
   }
 </style>

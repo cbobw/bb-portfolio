@@ -465,7 +465,7 @@ class PortfolioGenApp:
 
         btn_pdf = tk.Button(
             self.root,
-            text="輸出最新版",
+            text="輸出完整最新版 PDF",
             command=self.on_export_pdf,
             bg=FOCUS,
             fg=BG,
