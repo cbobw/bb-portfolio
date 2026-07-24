@@ -7,6 +7,9 @@
   --color-purple-hover: #b6b9ff;
 
   --font-sans: 'IBM Plex Sans', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+  --font-display: 'Syne', 'IBM Plex Sans', 'Noto Sans TC', system-ui, sans-serif;
+  --font-serif: 'Noto Serif TC', 'Noto Sans TC', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 }
 
 @layer base {
