@@ -29,6 +29,7 @@ HOVER = "#B6B9FF"
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PORTFOLIO_DIR = REPO_ROOT / "src" / "content" / "portfolio"
 BIOGRAPHY_PATH = REPO_ROOT / "src" / "content" / "profile" / "biography.md"
+OUTFIT_FONT = REPO_ROOT / "src" / "fonts" / "outfit" / "Outfit-Variable.ttf"
 DEFAULT_OUTPUT = Path(__file__).resolve().parent / "output" / "bingle-portfolio.pdf"
 
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
@@ -304,7 +305,16 @@ def build_html(projects: list[Project], bio_meta: dict, bio_html: str) -> str:
 
 
 def build_css() -> str:
+    # file:// URL，供 WeasyPrint 嵌入完整 Outfit（含 ss01 GSUB）
+    outfit_url = OUTFIT_FONT.resolve().as_uri()
     return f"""
+@font-face {{
+  font-family: "Outfit";
+  src: url("{outfit_url}") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+}}
+
 @page {{
   size: A4;
   margin: 14mm 16mm 16mm 16mm;
@@ -312,7 +322,7 @@ def build_css() -> str:
 
   @bottom-center {{
     content: counter(page);
-    font-family: "IBM Plex Sans", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    font-family: "Outfit", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
     font-size: 8pt;
     color: {BORDER};
     letter-spacing: 0.12em;
@@ -328,7 +338,7 @@ html, body {{
   padding: 0;
   background: {BG};
   color: {FOCUS};
-  font-family: "IBM Plex Sans", "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif;
+  font-family: "Plus Jakarta Sans", "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif;
   font-size: 10pt;
   line-height: 1.55;
 }}
@@ -345,6 +355,8 @@ html, body {{
 
 .eyebrow {{
   margin: 0 0 6pt;
+  font-family: "Outfit", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  font-feature-settings: "ss01" 1;
   font-size: 8pt;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -353,14 +365,15 @@ html, body {{
 
 h1, h2, h3 {{
   margin: 0;
-  font-weight: 500;
+  font-family: "Outfit", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  font-feature-settings: "ss01" 1, "cv01" 1;
+  font-weight: 700;
   color: {FOCUS};
 }}
 
 h1 {{
   font-size: 42pt;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }}
 
 h2 {{
@@ -376,6 +389,8 @@ h2 {{
 
 .project-id {{
   margin: 8pt 0 0;
+  font-family: "Outfit", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  font-feature-settings: "ss01" 1;
   font-size: 8pt;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -404,6 +419,8 @@ h2 {{
 
 .cover-tag {{
   margin: 6pt 0 0;
+  font-family: "Outfit", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  font-feature-settings: "ss01" 1;
   font-size: 9pt;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -432,6 +449,8 @@ h2 {{
 }}
 
 .prose h1, .prose h2, .prose h3 {{
+  font-family: "Outfit", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  font-feature-settings: "ss01" 1, "cv01" 1;
   font-size: 11pt;
   margin: 12pt 0 6pt;
   color: {FOCUS};
@@ -580,6 +599,8 @@ h2 {{
   margin-top: 16pt;
   padding-top: 8pt;
   border-top: 1pt solid {BORDER};
+  font-family: "Outfit", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  font-feature-settings: "ss01" 1;
   font-size: 8pt;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -589,6 +610,12 @@ h2 {{
 
 
 def generate(output: Path, portfolio_dir: Path, biography_path: Path) -> Path:
+    if not OUTFIT_FONT.is_file():
+        raise FileNotFoundError(
+            f"找不到 Outfit 字型：{OUTFIT_FONT}\n"
+            "請確認 src/fonts/outfit/Outfit-Variable.ttf 存在（網站與 PDF 共用）。"
+        )
+
     projects = scan_projects(portfolio_dir)
     if not projects:
         raise RuntimeError("未找到任何作品專案，請確認 src/content/portfolio/")

@@ -1,0 +1,22 @@
+---
+import { withBase } from '../utils/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-beige-dark/50 pb-[calc(4.25rem+env(safe-area-inset-bottom))] pt-6 md:pb-6 lg:pt-8">
+  <div
+    class="grid-container flex flex-col gap-3 font-mono text-[10px] uppercase tracking-[0.18em] text-warm-taupe sm:text-xs md:flex-row md:items-center md:justify-between"
+  >
+    <span>© {year} binglebb</span>
+    <div class="flex flex-wrap gap-x-4 gap-y-1">
+      <a href={withBase('future-plans')} class="transition-colors hover:text-purple-focus">
+        Plans
+      </a>
+      <a href={withBase('secret-base')} class="transition-colors hover:text-purple-focus">
+        Secret
+      </a>
+      <span class="text-warm-taupe/80">Industrial Design · Fine Art</span>
+    </div>
+  </div>
+</footer>

@@ -1,178 +1,432 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { withBase } from '../utils/site';
 
-const email = 'binglebb@gmail.com';
+/** 聯絡管道 */
+const contacts = {
+  email: 'binglebb@gmail.com',
+  instagram: {
+    handle: '@binglebb',
+    url: 'https://www.instagram.com/binglebb/',
+  },
+  facebook: {
+    handle: 'Bingle Chen',
+    url: '',
+  },
+  discord: {
+    username: 'binglebb',
+    id: 'binglebb',
+  },
+  phone: {
+    display: '0909-917-538',
+    tel: '+886909917538',
+  },
+} as const;
+
+const channels = [
+  {
+    id: 'email',
+    label: 'Email',
+    title: contacts.email,
+    meta: 'Copy / Mailto',
+    copy: contacts.email,
+    href: `mailto:${contacts.email}`,
+    hrefLabel: 'Send Mail',
+    action: 'copy' as const,
+  },
+  {
+    id: 'instagram',
+    label: 'Instagram',
+    title: contacts.instagram.handle,
+    meta: 'Open Profile',
+    copy: '',
+    href: contacts.instagram.url,
+    hrefLabel: 'Open IG',
+    action: 'link' as const,
+  },
+  {
+    id: 'facebook',
+    label: 'Facebook',
+    title: contacts.facebook.handle,
+    meta: 'Copy Name',
+    copy: contacts.facebook.handle,
+    href: '',
+    hrefLabel: '',
+    action: 'copy' as const,
+  },
+  {
+    id: 'discord',
+    label: 'Discord',
+    title: contacts.discord.username,
+    meta: 'Copy Username',
+    copy: contacts.discord.id,
+    href: '',
+    hrefLabel: '',
+    action: 'copy' as const,
+  },
+  {
+    id: 'phone',
+    label: 'Phone',
+    title: contacts.phone.display,
+    meta: 'Copy / Call',
+    copy: contacts.phone.tel,
+    href: `tel:${contacts.phone.tel}`,
+    hrefLabel: 'Call',
+    action: 'both' as const,
+  },
+];
 ---
 
-<BaseLayout title="Contact — Bingle" description="旋轉旋鈕解鎖聯絡信箱">
-  <section class="mx-auto grid max-w-lg gap-8 sm:gap-10 md:gap-12" data-contact-knob>
-    <header class="grid gap-2 sm:gap-3">
-      <p class="text-[10px] uppercase tracking-[0.25em] text-beige-dark sm:text-xs">Contact</p>
-      <h1 class="text-xl font-medium text-neutral-900 sm:text-2xl md:text-3xl">實體旋鈕</h1>
-      <p class="text-sm text-neutral-600 sm:text-base" data-knob-hint>
-        順時針旋轉到底以解鎖信箱 · 支援滑鼠拖曳與觸控畫圓
-      </p>
-    </header>
+<BaseLayout
+  title="Contact — Bingle"
+  description="師生課堂控管 — 把老師拉上講臺，讓聯絡卡片安靜排好"
+  fullBleed
+  hideFooter
+>
+  <section
+    class="classroom relative h-[calc(100dvh-3rem)] overflow-hidden md:h-[calc(100dvh-3.5rem)] lg:h-[calc(100dvh-4rem)]"
+    data-contact-classroom
+  >
+    <h1 class="sr-only">聯絡 · 師生課堂控管</h1>
+    <div class="classroom-grid pointer-events-none absolute inset-0" aria-hidden="true"></div>
 
-    <div class="flex flex-col items-center gap-8 sm:gap-10">
-      <!-- 進度環 -->
+    <!-- 物理場 -->
+    <div
+      data-classroom-arena
+      class="classroom-arena absolute inset-0 z-10 touch-none overflow-hidden pb-[4.25rem] md:pb-0"
+    >
+      <!-- 講臺 -->
       <div
-        data-knob-progress
-        class="knob-progress relative"
-        role="progressbar"
-        aria-valuemin="0"
-        aria-valuemax="100"
-        aria-valuenow="0"
-        aria-label="旋鈕解鎖進度"
+        data-teacher-seat
+        class="teacher-seat pointer-events-none absolute left-1/2 top-4 z-20 -translate-x-1/2 sm:top-5"
+        aria-hidden="true"
       >
-        <button
-          type="button"
-          data-knob
-          class="knob touch-none select-none"
-          aria-label="聯絡旋鈕，按住並旋轉以解鎖"
-        >
-          <span data-knob-dial class="knob-dial">
-            <span class="knob-tick" aria-hidden="true"></span>
-            <span class="knob-hub" aria-hidden="true"></span>
-            <span class="knob-grip" aria-hidden="true"></span>
-          </span>
-        </button>
+        <div class="teacher-seat-frame">
+          <p class="teacher-seat-label">講臺 / Teacher Seat</p>
+          <span class="teacher-seat-mark" aria-hidden="true"></span>
+        </div>
       </div>
 
-      <div
-        data-knob-reveal
-        class="knob-reveal w-full border border-beige-dark/50 bg-beige-light px-4 py-5 text-center sm:px-6 sm:py-6"
-        hidden
+      <!-- 老師小人（可拖拽）— 初始於中上 -->
+      <button
+        type="button"
+        data-teacher
+        class="teacher-figure absolute left-0 top-0 z-40 touch-none select-none"
+        aria-label="Teacher Placeholder，拖到中央講臺讓卡片安靜排好"
       >
-        <p class="mb-2 text-[10px] uppercase tracking-[0.2em] text-beige-dark sm:text-xs">
-          Unlocked
-        </p>
-        <a
-          href={`mailto:${email}`}
-          class="break-all text-base font-medium text-purple-focus transition-colors hover:text-purple-hover sm:text-lg md:text-xl"
+        <svg
+          class="teacher-svg"
+          viewBox="0 0 48 64"
+          width="48"
+          height="64"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
         >
-          {email}
-        </a>
+          <circle cx="24" cy="12" r="8" stroke="#8A6BBE" stroke-width="1.75" fill="#F1EAD7"></circle>
+          <path
+            d="M12 28c0-4 5.5-7 12-7s12 3 12 7v18c0 2-2 4-4 4H16c-2 0-4-2-4-4V28Z"
+            stroke="#8A6BBE"
+            stroke-width="1.75"
+            fill="#F1EAD7"></path>
+          <path d="M18 50v10M30 50v10" stroke="#6E5F4B" stroke-width="1.75" stroke-linecap="square"
+          ></path>
+          <path d="M12 34h-4M36 34h4" stroke="#6E5F4B" stroke-width="1.5" stroke-linecap="square"
+          ></path>
+        </svg>
+        <span class="teacher-caption">Teacher Placeholder</span>
+      </button>
+
+      <!-- 聯絡卡片層 -->
+      <div data-classroom-layer class="absolute inset-0 z-30">
+        {
+          channels.map((ch) => (
+            <article
+              data-contact-card
+              data-channel={ch.id}
+              class="contact-card absolute left-0 top-0 flex w-[min(85vw,17.25rem)] flex-col border border-beige-dark bg-beige-light p-4 sm:w-[20.25rem] sm:p-5 md:w-[21rem]"
+              style="will-change: transform;"
+            >
+              <div class="mb-3 flex items-start justify-between gap-2">
+                <span class="contact-card-icon text-purple-focus" aria-hidden="true">
+                  {ch.id === 'email' && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="h-6 w-6 sm:h-7 sm:w-7">
+                      <rect x="3" y="5" width="18" height="14" rx="1.5" />
+                      <path d="m4 7 8 6 8-6" />
+                    </svg>
+                  )}
+                  {ch.id === 'instagram' && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="h-6 w-6 sm:h-7 sm:w-7">
+                      <rect x="3.5" y="3.5" width="17" height="17" rx="4.5" />
+                      <circle cx="12" cy="12" r="4" />
+                      <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
+                    </svg>
+                  )}
+                  {ch.id === 'facebook' && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="h-6 w-6 sm:h-7 sm:w-7">
+                      <path d="M14 8h2.5V5H14a4 4 0 0 0-4 4v2H7.5v3H10v7h3v-7h2.3l.7-3H13V9a1 1 0 0 1 1-1Z" />
+                    </svg>
+                  )}
+                  {ch.id === 'discord' && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="h-6 w-6 sm:h-7 sm:w-7">
+                      <path d="M7.5 5.5c2-.7 3.8-1 4.5-1s2.5.3 4.5 1l1.2 3.2c1.1.3 2 .8 2.8 1.4-.4 2.1-1.3 4-2.5 5.5-1.3.4-2.7.7-4 .8l-1-1.3h-2l-1 1.3c-1.3-.1-2.7-.4-4-.8C4.8 14.1 3.9 12.2 3.5 10c.8-.6 1.7-1.1 2.8-1.4L7.5 5.5Z" />
+                      <circle cx="9.2" cy="11.2" r="1.1" fill="currentColor" stroke="none" />
+                      <circle cx="14.8" cy="11.2" r="1.1" fill="currentColor" stroke="none" />
+                    </svg>
+                  )}
+                  {ch.id === 'phone' && (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="h-6 w-6 sm:h-7 sm:w-7">
+                      <path d="M8.2 3.8h3.1l1.2 3.2-1.8 1.2a11.5 11.5 0 0 0 5.1 5.1l1.2-1.8 3.2 1.2v3.1c0 .8-.6 1.5-1.4 1.6A15.4 15.4 0 0 1 3.8 6.2c.1-.8.8-1.4 1.6-1.4Z" />
+                    </svg>
+                  )}
+                </span>
+                <span class="label-mono text-xs text-purple-focus sm:text-sm">{ch.label}</span>
+              </div>
+              <h2 class="mb-1.5 break-all text-base leading-snug text-warm-taupe sm:text-lg">
+                {ch.title}
+              </h2>
+              <p class="label-mono mb-auto text-xs text-warm-taupe/90 sm:text-sm">{ch.meta}</p>
+
+              <div class="contact-card-actions mt-3 flex flex-wrap gap-2">
+                {(ch.action === 'copy' || ch.action === 'both') && ch.copy && (
+                  <button
+                    type="button"
+                    data-copy={ch.copy}
+                    class="contact-btn inline-flex min-h-11 flex-1 items-center justify-center border border-beige-dark px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-warm-taupe sm:text-xs"
+                  >
+                    Copy
+                  </button>
+                )}
+                {(ch.action === 'link' || ch.action === 'both') && ch.href && (
+                  <a
+                    href={ch.href}
+                    data-contact-link
+                    target={ch.action === 'link' ? '_blank' : undefined}
+                    rel={ch.action === 'link' ? 'noopener noreferrer' : undefined}
+                    class="contact-btn inline-flex min-h-11 flex-1 items-center justify-center border border-beige-dark px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-warm-taupe sm:text-xs"
+                  >
+                    {ch.hrefLabel}
+                  </a>
+                )}
+                {ch.action === 'copy' && ch.href && (
+                  <a
+                    href={ch.href}
+                    data-contact-link
+                    class="contact-btn inline-flex min-h-11 flex-1 items-center justify-center border border-beige-dark px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-warm-taupe sm:text-xs"
+                  >
+                    {ch.hrefLabel}
+                  </a>
+                )}
+              </div>
+            </article>
+          ))
+        }
       </div>
     </div>
 
-    <nav class="flex flex-wrap gap-x-4 gap-y-2 border-t border-beige-dark/40 pt-6 text-xs tracking-[0.12em] text-neutral-500 sm:text-sm">
-      <a href={withBase('future-plans')} class="hover:text-purple-focus">Future Plans →</a>
-      <a href={withBase('secret-base')} class="hover:text-purple-focus">Secret Base →</a>
-    </nav>
+    <!-- Toast -->
+    <div
+      data-toast
+      class="contact-toast fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] left-1/2 z-50 -translate-x-1/2 border border-purple-focus bg-beige-light px-4 py-3 font-mono text-[10px] uppercase tracking-[0.18em] text-purple-focus shadow-[0_8px_24px_color-mix(in_srgb,#8A6BBE_18%,transparent)] md:bottom-8 sm:text-xs"
+      hidden
+      role="status"
+      aria-live="polite"
+    >
+      Copied to Clipboard!
+    </div>
   </section>
 </BaseLayout>
 
 <script>
-  import { initContactKnob } from '../scripts/knob-contact';
+  import { initContactClassroom } from '../scripts/contact-classroom';
 
-  const root = document.querySelector<HTMLElement>('[data-contact-knob]');
-  const cleanup = root ? initContactKnob(root) : () => {};
+  const root = document.querySelector<HTMLElement>('[data-contact-classroom]');
+  const cleanup = root ? initContactClassroom(root) : () => {};
   document.addEventListener('astro:before-swap', () => cleanup(), { once: true });
 </script>
 
 <style>
-  .knob-progress {
-    --knob-pct: 0%;
-    width: min(72vw, 280px);
-    aspect-ratio: 1;
-    border-radius: 9999px;
-    background: conic-gradient(
-      #8a6bbe var(--knob-pct),
-      color-mix(in srgb, #d4c4a8 45%, transparent) 0
-    );
-    padding: 10px;
-    display: grid;
-    place-items: center;
-  }
-
-  .knob {
-    width: 100%;
-    height: 100%;
-    border-radius: 9999px;
-    border: 1px solid #d4c4a8;
-    background:
-      radial-gradient(circle at 35% 30%, #f8f3e6 0%, #f1ead7 45%, #e4d7bc 100%);
-    box-shadow:
-      inset 0 2px 6px rgba(255, 255, 255, 0.55),
-      inset 0 -4px 10px rgba(140, 120, 90, 0.18),
-      0 10px 28px color-mix(in srgb, #8a6bbe 12%, transparent);
-    cursor: grab;
-    position: relative;
-    padding: 0;
-  }
-
-  .knob.is-dragging {
-    cursor: grabbing;
-  }
-
-  .knob.is-unlocked {
-    border-color: #8a6bbe;
-    box-shadow:
-      inset 0 2px 6px rgba(255, 255, 255, 0.55),
-      0 0 0 2px color-mix(in srgb, #b6b9ff 55%, transparent),
-      0 12px 32px color-mix(in srgb, #8a6bbe 22%, transparent);
-  }
-
-  .knob-dial {
-    position: absolute;
-    inset: 12%;
-    border-radius: 9999px;
-    border: 1px dashed color-mix(in srgb, #d4c4a8 70%, transparent);
-    display: block;
-    transform-origin: center;
-    will-change: transform;
-  }
-
-  .knob-tick {
-    position: absolute;
-    left: 50%;
-    top: 8%;
-    width: 3px;
-    height: 22%;
-    margin-left: -1.5px;
-    border-radius: 2px;
-    background: #8a6bbe;
-    box-shadow: 0 0 8px color-mix(in srgb, #b6b9ff 60%, transparent);
-  }
-
-  .knob-hub {
-    position: absolute;
-    inset: 34%;
-    border-radius: 9999px;
-    border: 1px solid #d4c4a8;
+  .classroom {
     background: #f1ead7;
   }
 
-  .knob-grip {
-    position: absolute;
-    inset: 0;
-    border-radius: 9999px;
-    background: repeating-conic-gradient(
-      from 0deg,
-      transparent 0deg 8deg,
-      color-mix(in srgb, #d4c4a8 22%, transparent) 8deg 9deg
-    );
+  .classroom-grid {
+    background-image:
+      linear-gradient(color-mix(in srgb, #d4c4a8 26%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, #d4c4a8 26%, transparent) 1px, transparent 1px);
+    background-size: 32px 32px;
+    opacity: 0.45;
+  }
+
+  .teacher-seat {
+    width: min(42vw, 168px);
+  }
+
+  .teacher-seat-frame {
+    position: relative;
+    aspect-ratio: 5 / 4;
+    border: 1.5px dashed #d4c4a8;
+    background:
+      linear-gradient(135deg, color-mix(in srgb, #d4c4a8 12%, transparent), transparent 55%),
+      color-mix(in srgb, #f1ead7 70%, transparent);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition:
+      border-color 0.25s ease,
+      background-color 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  .teacher-seat.is-occupied .teacher-seat-frame {
+    border-style: solid;
+    border-color: #8a6bbe;
+    background: color-mix(in srgb, #b6b9ff 14%, #f1ead7);
+    box-shadow: 0 0 0 1px color-mix(in srgb, #8a6bbe 35%, transparent);
     opacity: 0.55;
+  }
+
+  .teacher-seat-label {
+    margin: 0;
+    padding: 0 0.5rem;
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6e5f4b;
+  }
+
+  .teacher-seat.is-occupied .teacher-seat-label {
+    color: #8a6bbe;
+  }
+
+  .teacher-seat-mark {
+    width: 28px;
+    height: 2px;
+    background: #d4c4a8;
+  }
+
+  .teacher-seat.is-occupied .teacher-seat-mark {
+    background: #8a6bbe;
+  }
+
+  .teacher-figure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    min-width: 56px;
+    min-height: 72px;
+    border: none;
+    background: transparent;
+    cursor: grab;
+    touch-action: none;
+    will-change: transform;
+  }
+
+  .teacher-figure:focus-visible {
+    outline: 2px solid #8a6bbe;
+    outline-offset: 3px;
+  }
+
+  .teacher-figure.is-dragging {
+    cursor: grabbing;
+    z-index: 50;
+  }
+
+  .teacher-figure.is-seated .teacher-svg circle,
+  .teacher-figure.is-seated .teacher-svg path:nth-of-type(1) {
+    fill: color-mix(in srgb, #b6b9ff 35%, #f1ead7);
+  }
+
+  .teacher-caption {
+    max-width: 4.5rem;
+    text-align: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    line-height: 1.35;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #6e5f4b;
+  }
+
+  .contact-card {
+    border-radius: 1rem;
+    box-shadow:
+      0 1px 0 color-mix(in srgb, #d4c4a8 40%, transparent),
+      0 4px 0 #d4c4a8;
+    transform-origin: center center;
+    user-select: none;
+  }
+
+  .contact-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .classroom.is-ordered .contact-card.is-interactive .contact-card-icon {
+    color: #8a6bbe;
+  }
+
+  .classroom.is-chaos .contact-card {
     pointer-events: none;
   }
 
-  .knob-reveal {
-    opacity: 0;
-    transform: translateY(8px);
-    transition:
-      opacity 0.35s ease,
-      transform 0.35s ease;
+  .classroom.is-chaos .contact-card-actions {
+    opacity: 0.35;
   }
 
-  .knob-reveal.is-revealed {
+  .classroom.is-ordered .contact-card {
+    pointer-events: auto;
+  }
+
+  .classroom.is-ordered .contact-card.is-interactive {
+    border-color: #8a6bbe;
+    box-shadow:
+      0 1px 0 color-mix(in srgb, #8a6bbe 30%, transparent),
+      0 4px 0 #8a6bbe;
+  }
+
+  .classroom.is-ordered .contact-card-actions {
     opacity: 1;
-    transform: translateY(0);
+  }
+
+  .contact-btn {
+    transition:
+      color 0.15s ease,
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+
+  .classroom.is-ordered .contact-btn:hover,
+  .classroom.is-ordered .contact-btn:focus-visible {
+    color: #8a6bbe;
+    border-color: #8a6bbe;
+    background: color-mix(in srgb, #b6b9ff 18%, transparent);
+  }
+
+  .contact-toast {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .contact-toast.is-show {
+    opacity: 1;
+    transform: translate(-50%, 0);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .knob-reveal {
+    .teacher-seat-frame,
+    .contact-btn,
+    .contact-toast {
       transition: none;
     }
   }

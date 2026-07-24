@@ -10,6 +10,7 @@ export function initBlueprintToggle(root: HTMLElement) {
   let mode: 'solid' | 'wireframe' = 'solid';
 
   const apply = () => {
+    // 整頁藍圖同步切換（外層 page + 圖紙 stage）
     stage.dataset.mode = mode;
     root.dataset.mode = mode;
     btn.setAttribute('aria-pressed', mode === 'wireframe' ? 'true' : 'false');

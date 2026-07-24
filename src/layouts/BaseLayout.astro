@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import TopNav from '../components/TopNav.astro';
 import BottomNav from '../components/BottomNav.astro';
+import Footer from '../components/Footer.astro';
 import { withBase } from '../utils/site';
 
 interface Props {
@@ -33,13 +34,14 @@ const currentPath = Astro.url.pathname;
     <link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Outfit 改為自架完整字檔（src/fonts），以保留 ss01 OpenType；其餘字體仍走 Google Fonts -->
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Noto+Sans+TC:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Mono&display=swap"
       rel="stylesheet"
     />
     <title>{title}</title>
   </head>
-  <body class="flex min-h-dvh flex-col">
+  <body class="flex min-h-dvh flex-col font-sans">
     <TopNav currentPath={currentPath} />
 
     <main
@@ -53,24 +55,7 @@ const currentPath = Astro.url.pathname;
       <slot />
     </main>
 
-    {
-      !hideFooter && (
-        <footer class="border-t border-beige-dark/50 pb-[calc(4.25rem+env(safe-area-inset-bottom))] pt-6 md:pb-6 lg:pt-8">
-          <div class="grid-container flex flex-col gap-3 text-[10px] uppercase tracking-[0.18em] text-beige-dark sm:text-xs md:flex-row md:items-center md:justify-between">
-            <span>© {new Date().getFullYear()} Chen Yu-Bin</span>
-            <div class="flex flex-wrap gap-x-4 gap-y-1">
-              <a href={withBase('future-plans')} class="transition-colors hover:text-purple-focus">
-                Plans
-              </a>
-              <a href={withBase('secret-base')} class="transition-colors hover:text-purple-focus">
-                Secret
-              </a>
-              <span class="text-beige-dark/70">Industrial Design · Fine Art</span>
-            </div>
-          </div>
-        </footer>
-      )
-    }
+    {!hideFooter && <Footer />}
 
     <BottomNav currentPath={currentPath} />
   </body>

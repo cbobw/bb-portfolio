@@ -1,19 +1,71 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection, render } from 'astro:content';
-
-const entries = await getCollection('profile');
-const entry = entries[0];
-
-if (!entry) {
-  throw new Error('Profile content not found');
-}
-
-const { Content } = await render(entry);
 ---
 
 <BaseLayout title="About — Bingle" description="關於陳禹賓 Bingle">
-  <article class="prose prose-neutral max-w-none prose-headings:font-medium prose-headings:tracking-tight prose-p:text-sm prose-p:leading-relaxed sm:prose-p:text-base md:prose-lg">
-    <Content />
-  </article>
+  <section aria-labelledby="about-heading">
+    <header class="mb-6 grid gap-2 sm:mb-8 md:mb-10">
+      <p class="label-mono text-[10px] text-warm-taupe sm:text-xs">
+        About
+      </p>
+      <h1
+        id="about-heading"
+        class="font-heading text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl md:text-4xl"
+      >
+        此刻狀態
+      </h1>
+    </header>
+
+    <div class="border border-beige-dark px-5 py-8 sm:px-8 sm:py-10 md:max-w-3xl md:px-10 md:py-12">
+      <div class="grid gap-8 sm:gap-10">
+        <div class="grid gap-3 sm:gap-4">
+          <p class="label-mono text-[10px] text-purple-focus sm:text-xs">
+            Identity
+          </p>
+          <h2 class="font-heading text-2xl font-bold tracking-tight text-neutral-900 sm:text-3xl">
+            <span class="brand-display">陳禹賓 / Bingle</span>
+          </h2>
+          <p class="text-sm tracking-[0.06em] text-warm-taupe sm:text-base">
+            工業設計師 · 藝術創作者
+          </p>
+        </div>
+
+        <blockquote class="border-l border-beige-dark pl-4 sm:pl-5">
+          <p class="font-heading text-base font-bold leading-relaxed text-neutral-900 sm:text-lg md:text-xl">
+            「設計是物件的理性骨架，而藝術是物質的感性皮膚。」
+          </p>
+        </blockquote>
+
+        <p class="max-w-2xl text-sm leading-relaxed text-warm-taupe sm:text-base">
+          目前就讀東海大學工業設計學系，專注產品外觀、結構驗證與數位建模（Creo /
+          Blender），在幾何秩序中保留手繪與純藝術的感性肌理，追求極簡與工藝觸感。
+        </p>
+
+        <dl class="grid gap-4 border-t border-beige-dark/60 pt-6 sm:grid-cols-2 sm:gap-6 sm:pt-8">
+          <div class="grid gap-1.5">
+            <dt class="label-mono text-[10px] text-warm-taupe sm:text-xs">
+              Status
+            </dt>
+            <dd class="text-sm text-neutral-900 sm:text-base">THUID · 在學</dd>
+            <dd class="font-mono text-xs tracking-[0.08em] text-purple-focus sm:text-sm">
+              2025 – Present
+            </dd>
+          </div>
+          <div class="grid gap-1.5">
+            <dt class="label-mono text-[10px] text-warm-taupe sm:text-xs">
+              Contact
+            </dt>
+            <dd>
+              <a
+                href="mailto:binglebb@gmail.com"
+                class="text-sm text-purple-focus transition-colors hover:text-purple-hover sm:text-base"
+              >
+                binglebb@gmail.com
+              </a>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
 </BaseLayout>

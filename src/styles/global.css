@@ -1,12 +1,36 @@
 @import 'tailwindcss';
 
+/* 自架完整 Outfit（含 GSUB ss01）— Google Fonts CDN 會剝除 Stylistic Sets */
+@font-face {
+  font-family: 'Outfit';
+  src: url('../fonts/outfit/Outfit-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --color-beige-light: #f1ead7;
+  /* 邊框／海浪／卡片底／幾何外框 — 嚴禁當文字色 */
   --color-beige-dark: #d4c4a8;
+  /* 副標、說明、年份、標籤等次要文字 */
+  --color-warm-taupe: #6e5f4b;
   --color-purple-focus: #8a6bbe;
   --color-purple-hover: #b6b9ff;
 
-  --font-sans: 'IBM Plex Sans', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+  /* 大標題、卡片標題 */
+  --font-heading: 'Outfit', 'Noto Sans TC', sans-serif;
+  /* 內文、段落、副標題 */
+  --font-sans: 'Plus Jakarta Sans', 'Noto Sans TC', sans-serif;
+  /* 數據、年份、狀態指示標籤 */
+  --font-mono: 'Space Mono', monospace;
+}
+
+/* 語意化標題字：Outfit + OpenType Stylistic Set */
+@utility font-heading {
+  font-family: var(--font-heading);
+  font-feature-settings: 'ss01' 1, 'cv01' 1;
+  font-variant-alternates: stylistic(ss01);
 }
 
 @layer base {
@@ -15,7 +39,22 @@
   }
 
   body {
-    @apply min-h-dvh bg-beige-light font-sans text-neutral-800 antialiased;
+    @apply min-h-dvh bg-beige-light font-sans text-warm-taupe antialiased;
+  }
+
+  /* 表單／按鈕繼承，避免系統預設字體 */
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  time,
+  code,
+  kbd,
+  samp {
+    @apply font-mono;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -35,7 +74,7 @@
   }
 
   .nav-link {
-    @apply text-sm tracking-wide text-neutral-700 transition-colors duration-200;
+    @apply font-heading text-sm font-semibold tracking-wide text-neutral-700 transition-colors duration-200;
   }
 
   .nav-link:hover,
@@ -45,5 +84,20 @@
 
   .nav-link-active {
     @apply text-purple-focus;
+  }
+
+  /* 年份／狀態／小標籤 */
+  .label-mono {
+    @apply font-mono uppercase tracking-[0.16em];
+  }
+
+  /* 品牌文字（導覽等）— 繼承標題字 + ss01 */
+  .brand-display {
+    display: inline-block;
+    max-width: 100%;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-feature-settings: 'ss01' 1, 'cv01' 1;
+    font-variant-alternates: stylistic(ss01);
   }
 }

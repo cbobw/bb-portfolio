@@ -40,7 +40,41 @@ const profile = defineCollection({
   }),
 });
 
+const futurePlanShape = z.enum([
+  'hex',
+  'circle',
+  'tri',
+  'rect',
+  'diamond',
+  'iso',
+  'ring',
+  'cross',
+]);
+
+const futurePlans = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/future-plans' }),
+  schema: z.object({
+    drawing: z.string().default('BINGLE-FUTURE'),
+    revision: z.string().default('A'),
+    scale: z.string().default('1:1'),
+    title: z.string(),
+    subtitle: z.string().optional(),
+    plans: z.array(
+      z.object({
+        id: z.string(),
+        title: z.string(),
+        desc: z.string(),
+        year: z.string(),
+        code: z.string().default(''),
+        status: z.enum(['research', 'build', 'exhibit', 'explore']).default('explore'),
+        shape: futurePlanShape.default('rect'),
+      }),
+    ),
+  }),
+});
+
 export const collections = {
   portfolio,
   profile,
+  futurePlans,
 };

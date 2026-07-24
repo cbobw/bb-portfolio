@@ -52,8 +52,8 @@ const axisCats = categories.map((c, i) => ({
       class="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-3 p-3 sm:p-4 md:p-5"
     >
       <div class="pointer-events-auto grid gap-1 border border-beige-dark/40 bg-beige-light/90 px-3 py-2 backdrop-blur-sm sm:px-4">
-        <p class="text-[10px] uppercase tracking-[0.22em] text-beige-dark sm:text-xs">Canvas</p>
-        <h1 class="text-sm font-medium text-neutral-900 sm:text-base md:text-lg">
+        <p class="label-mono text-[10px] text-warm-taupe sm:text-xs">Canvas</p>
+        <h1 class="font-heading text-sm font-bold text-neutral-900 sm:text-base md:text-lg">
           時間 × 分類
         </h1>
         <p class="hidden text-[10px] text-neutral-500 sm:block sm:text-xs">
@@ -84,7 +84,7 @@ const axisCats = categories.map((c, i) => ({
 
     <!-- 軸標籤（固定 HUD 提示） -->
     <div
-      class="pointer-events-none absolute bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-3 z-20 hidden text-[10px] uppercase tracking-[0.18em] text-beige-dark sm:left-4 md:bottom-4 md:block"
+      class="label-mono pointer-events-none absolute bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-3 z-20 hidden text-[10px] text-warm-taupe sm:left-4 md:bottom-4 md:block"
     >
       X → Year &nbsp;|&nbsp; Y → Category
     </div>
@@ -98,7 +98,7 @@ const axisCats = categories.map((c, i) => ({
         {
           axisYears.map(({ label, x }) => (
             <div
-              class="pointer-events-none absolute top-8 -translate-x-1/2 text-[10px] uppercase tracking-[0.2em] text-beige-dark/80"
+              class="label-mono pointer-events-none absolute top-8 -translate-x-1/2 text-[10px] text-warm-taupe/80"
               style={`left: ${x}px`}
             >
               {label}
@@ -108,7 +108,7 @@ const axisCats = categories.map((c, i) => ({
         {
           axisCats.map(({ label, y }) => (
             <div
-              class="pointer-events-none absolute left-4 -translate-y-1/2 rotate-[-90deg] text-[10px] uppercase tracking-[0.16em] text-beige-dark/80 origin-left"
+              class="label-mono pointer-events-none absolute left-4 origin-left -translate-y-1/2 rotate-[-90deg] text-[10px] text-warm-taupe/80"
               style={`top: ${y}px`}
             >
               {label}
@@ -138,10 +138,10 @@ const axisCats = categories.map((c, i) => ({
                   />
                 </div>
                 <div class="grid gap-1 p-3 sm:p-4">
-                  <span class="text-[10px] uppercase tracking-[0.16em] text-beige-dark">
+                  <span class="label-mono text-[10px] text-warm-taupe">
                     {project.data.year} · {project.data.category}
                   </span>
-                  <h2 class="text-sm font-medium text-neutral-900 group-hover:text-purple-focus sm:text-base">
+                  <h2 class="font-heading text-sm font-bold text-neutral-900 group-hover:text-purple-focus sm:text-base">
                     {project.data.title}
                   </h2>
                   <p class="text-xs text-neutral-600">{project.data.subtitle}</p>

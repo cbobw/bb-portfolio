@@ -31,7 +31,7 @@ function isActive(href: string): boolean {
   <nav class="grid-container flex h-12 items-center justify-between sm:h-14 lg:h-16" aria-label="主要導覽">
     <a
       href={withBase('')}
-      class="text-xs font-medium uppercase tracking-[0.2em] text-neutral-800 transition-colors hover:text-purple-focus sm:text-sm"
+      class="font-heading text-sm font-bold tracking-[0.08em] text-neutral-800 transition-colors hover:text-purple-focus sm:text-base"
     >
       Bingle
     </a>
@@ -67,7 +67,7 @@ function isActive(href: string): boolean {
               <a
                 href={withBase(href.replace(/^\//, ''))}
                 class:list={[
-                  'text-[10px] uppercase tracking-[0.16em] text-beige-dark transition-colors hover:text-purple-focus lg:text-xs',
+                  'font-heading text-[10px] font-semibold tracking-[0.12em] text-warm-taupe transition-colors hover:text-purple-focus lg:text-xs',
                   isActive(href) && 'text-purple-focus',
                 ]}
                 aria-current={isActive(href) ? 'page' : undefined}

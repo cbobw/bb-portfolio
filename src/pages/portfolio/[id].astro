@@ -33,10 +33,10 @@ const showDetails = hasDetailImages(project.data.detailImages);
       <!-- Col 1：メタ / 規格 -->
       <aside class="grid gap-5 sm:gap-6 lg:col-span-3 lg:gap-8">
         <header class="grid gap-2 border-b border-beige-dark/40 pb-4 sm:gap-3 sm:pb-5">
-          <p class="text-[10px] uppercase tracking-[0.22em] text-beige-dark sm:text-xs">
+          <p class="label-mono text-[10px] text-warm-taupe sm:text-xs">
             {project.data.category} · {project.data.year} · {project.data.tag}
           </p>
-          <h1 class="text-xl font-medium text-neutral-900 sm:text-2xl lg:text-2xl xl:text-3xl">
+          <h1 class="font-heading text-xl font-bold text-neutral-900 sm:text-2xl lg:text-2xl xl:text-3xl">
             {project.data.title}
           </h1>
           <p class="text-sm text-neutral-600 sm:text-base">{project.data.subtitle}</p>
@@ -47,7 +47,7 @@ const showDetails = hasDetailImages(project.data.detailImages);
             <dl class="grid gap-3 sm:gap-4">
               {project.data.specifications.map(({ label, value }) => (
                 <div class="grid gap-1 border-b border-beige-dark/25 pb-3">
-                  <dt class="text-[10px] uppercase tracking-[0.16em] text-beige-dark sm:text-xs">
+                  <dt class="label-mono text-[10px] text-warm-taupe sm:text-xs">
                     {label}
                   </dt>
                   <dd class="text-sm text-neutral-700 sm:text-base">{value}</dd>
@@ -91,7 +91,7 @@ const showDetails = hasDetailImages(project.data.detailImages);
             loading="eager"
           />
           <figcaption
-            class="pointer-events-none absolute bottom-2 right-2 bg-beige-light/80 px-2 py-1 text-[9px] uppercase tracking-[0.14em] text-beige-dark backdrop-blur-sm sm:text-[10px]"
+            class="label-mono pointer-events-none absolute bottom-2 right-2 bg-beige-light/80 px-2 py-1 text-[9px] text-warm-taupe backdrop-blur-sm sm:text-[10px]"
           >
             <span class="hidden md:inline">游標放大</span>
             <span class="md:hidden">雙擊放大 · 捏合縮放</span>
@@ -129,7 +129,7 @@ const showDetails = hasDetailImages(project.data.detailImages);
         }
 
         <div
-          class="prose prose-neutral max-w-none border-t border-beige-dark/40 pt-5 prose-headings:font-medium prose-p:text-sm prose-p:leading-relaxed sm:pt-6 sm:prose-p:text-base lg:border-t-0 lg:pt-0"
+          class="prose prose-neutral max-w-none border-t border-beige-dark/40 pt-5 font-sans prose-headings:font-heading prose-headings:font-bold prose-p:text-sm prose-p:leading-relaxed sm:pt-6 sm:prose-p:text-base lg:border-t-0 lg:pt-0"
         >
           <Content />
         </div>

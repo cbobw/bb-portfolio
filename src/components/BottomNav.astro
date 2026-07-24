@@ -33,7 +33,7 @@ function isActive(href: string): boolean {
           <a
             href={withBase(href.replace(/^\//, ''))}
             class:list={[
-              'flex min-h-11 flex-col items-center gap-1 px-1 py-2.5 text-[10px] tracking-wide transition-colors sm:py-3 sm:text-xs',
+              'flex min-h-11 flex-col items-center gap-1 px-1 py-2.5 font-sans text-[10px] tracking-wide transition-colors sm:py-3 sm:text-xs',
               isActive(href)
                 ? 'text-purple-focus'
                 : 'text-neutral-600 hover:text-purple-focus',

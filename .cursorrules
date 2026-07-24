@@ -5,7 +5,8 @@ You are a Top-tier Full-stack Agent (Astro + Tailwind CSS + GSAP + Matter.js + P
 - Style: Extreme Minimalism, extreme rationality, focus on industrial craftsmanship.
 - Palette:
   - Background: Light Beige (#F1EAD7)
-  - Borders/Secondary Text: Dark Beige (#D4C4A8)
+  - Borders / Waves / Card fills / Geometry strokes: Dark Beige (#D4C4A8) — 專用於邊框、海浪線條、卡片背景與幾何物件外框，嚴禁作為文字顏色
+  - Secondary Text: Deep Warm Beige / Dark Warm Taupe (#6E5F4B) — 專用於副標題、次要說明文字、年份與標籤，確保與亮米色背景有足夠閱讀對比度（Tailwind token: `warm-taupe`）
   - Strong Focus/Interactions: Dark Purple (#8A6BBE)
   - Hover/Glow transitions: Light Purple (#B6B9FF)
 
