@@ -151,12 +151,26 @@ def prune_old_public_pdfs(keep_filename: str) -> list[str]:
     return removed
 
 
+# 上架時一併納入的網站路徑（雜項由 .gitignore 排除：node_modules、dist、.venv 等）
+SITE_RELEASE_PATHS = (
+    "src",
+    "public",
+    "astro.config.mjs",
+    "package.json",
+    "package-lock.json",
+    ".cursorrules",
+    "pdf-generator/generate.py",
+    "bb-profolio-gen.py",
+)
+
+
 def git_paths_for_release(pdf_filename: str) -> list[str]:
-    """僅提交與 PDF 發布相關的檔案，避免 __pycache__ 等雜項。"""
-    return [
-        str(INDEX_ASTRO.relative_to(ROOT)),
-        str((PUBLIC_DOWNLOADS_DIR / pdf_filename).relative_to(ROOT)),
-    ]
+    """提交 PDF、各頁面改動與網站設定；確保本次 PDF 一定被加入。"""
+    paths = list(SITE_RELEASE_PATHS)
+    pdf_rel = (PUBLIC_DOWNLOADS_DIR / pdf_filename).relative_to(ROOT).as_posix()
+    if pdf_rel not in paths:
+        paths.append(pdf_rel)
+    return paths
 
 
 PORTFOLIO_PDF_CONST_PATTERN = re.compile(
@@ -327,7 +341,7 @@ def git_auto_push(
     pdf_filename: str,
 ) -> tuple[bool, str]:
     """
-    執行 git add / commit / push（僅發布相關檔案）。
+    執行 git add / commit / push（PDF + 各頁面與網站相關改動）。
     認證依賴本機已設定的 SSH 或 Git Credential Manager。
     回傳 (成功與否, 訊息)；失敗時不拋出例外。
     """
