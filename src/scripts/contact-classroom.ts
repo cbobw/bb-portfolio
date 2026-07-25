@@ -24,6 +24,7 @@ export function initContactClassroom(root: HTMLElement) {
   const arena = root.querySelector<HTMLElement>('[data-classroom-arena]');
   const seat = root.querySelector<HTMLElement>('[data-teacher-seat]');
   const teacher = root.querySelector<HTMLElement>('[data-teacher]');
+  const quote = root.querySelector<HTMLElement>('[data-classroom-quote]');
   const toast = root.querySelector<HTMLElement>('[data-toast]');
   const cards = Array.from(root.querySelectorAll<HTMLElement>('[data-contact-card]'));
 
@@ -49,6 +50,10 @@ export function initContactClassroom(root: HTMLElement) {
   let started = false;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const isMobile = () => window.matchMedia('(max-width: 639px)').matches;
+
+  const cardChamfer = () => (isMobile() ? 10 : 16);
 
   const size = () => {
     const r = arena.getBoundingClientRect();
@@ -205,11 +210,15 @@ export function initContactClassroom(root: HTMLElement) {
 
     cards.forEach((el, i) => {
       const { w: bw, h: bh } = cardSize(el);
-      const margin = 48;
+      const mobile = isMobile();
+      const margin = mobile ? 28 : 48;
+      const topReserve = mobile ? 150 : 100;
       const x = margin + Math.random() * Math.max(40, w - margin * 2);
-      const y = margin + Math.random() * Math.max(40, h - margin * 2);
+      const yMin = topReserve;
+      const yMax = Math.max(topReserve + 40, h - margin - bh / 2);
+      const y = yMin + Math.random() * (yMax - yMin);
       const body = Bodies.rectangle(x, y, bw, bh, {
-        chamfer: { radius: 16 },
+        chamfer: { radius: cardChamfer() },
         restitution: 0.88,
         friction: 0.02,
         frictionAir: 0.012,
@@ -238,19 +247,26 @@ export function initContactClassroom(root: HTMLElement) {
 
   const gridTargets = () => {
     const { w, h } = size();
-    const cols = w < 640 ? 1 : w < 1024 ? 2 : 3;
+    const mobile = isMobile();
+    const cols = mobile ? 2 : w < 1024 ? 2 : 3;
     const rows = Math.ceil(cards.length / cols);
-    const gapX = w < 640 ? 12 : 16;
-    const gapY = 14;
-    const padY = w < 640 ? 140 : 160;
-    const usableW = w - (w < 640 ? 32 : 64);
-    const usableH = Math.max(220, h - padY - 40);
-    const cellW = Math.min(w < 640 ? usableW : 330, (usableW - gapX * (cols - 1)) / cols);
-    const cellH = Math.min(192, (usableH - gapY * (rows - 1)) / rows);
+    const gapX = mobile ? 8 : 16;
+    const gapY = mobile ? 8 : 14;
+    const padX = mobile ? 12 : 32;
+    const padY = mobile ? 138 : 168;
+    const usableW = w - padX * 2;
+    const usableH = Math.max(mobile ? 260 : 220, h - padY - 20);
+    const cellW = mobile
+      ? (usableW - gapX * (cols - 1)) / cols
+      : Math.min(330, (usableW - gapX * (cols - 1)) / cols);
+    const cellH = Math.min(
+      mobile ? 94 : 192,
+      (usableH - gapY * (rows - 1)) / rows,
+    );
     const gridW = cols * cellW + (cols - 1) * gapX;
     const gridH = rows * cellH + (rows - 1) * gapY;
     const startX = (w - gridW) / 2;
-    const startY = Math.max(padY, (h - gridH) / 2 - 12);
+    const startY = Math.max(padY, (h - gridH) / 2 + (mobile ? 8 : 0));
 
     return cards.map((_, i) => {
       const col = i % cols;
@@ -258,7 +274,7 @@ export function initContactClassroom(root: HTMLElement) {
       return {
         x: startX + col * (cellW + gapX) + cellW / 2,
         y: startY + row * (cellH + gapY) + cellH / 2,
-        w: cellW,
+        w: mobile ? Math.min(cellW, cardSize(cards[i]!).w) : cellW,
         h: cellH,
       };
     });
@@ -356,6 +372,7 @@ export function initContactClassroom(root: HTMLElement) {
     const onSeat = seatContainsTeacher();
     seat.classList.toggle('is-occupied', onSeat);
     teacher.classList.toggle('is-seated', onSeat);
+    if (quote) quote.hidden = !onSeat;
     if (onSeat && !ordered) enterOrder();
     else if (!onSeat && ordered) enterChaos();
   };
@@ -367,8 +384,8 @@ export function initContactClassroom(root: HTMLElement) {
 
   const setTeacherPos = (x: number, y: number) => {
     const { w, h } = size();
-    const tw = teacher.offsetWidth || 56;
-    const th = teacher.offsetHeight || 72;
+    const tw = teacher.offsetWidth || 72;
+    const th = teacher.offsetHeight || 96;
     const nx = Math.min(w - tw - 4, Math.max(4, x));
     const ny = Math.min(h - th - 4, Math.max(4, y));
     teacher.style.transform = `translate(${nx}px, ${ny}px)`;
@@ -491,7 +508,7 @@ export function initContactClassroom(root: HTMLElement) {
         bw,
         bh,
         {
-          chamfer: { radius: 16 },
+          chamfer: { radius: cardChamfer() },
           restitution: 0.88,
           friction: 0.02,
           frictionAir: 0.012,

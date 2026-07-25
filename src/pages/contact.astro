@@ -97,43 +97,49 @@ const channels = [
       <!-- 講臺 -->
       <div
         data-teacher-seat
-        class="teacher-seat pointer-events-none absolute left-1/2 top-4 z-20 -translate-x-1/2 sm:top-5"
+        class="teacher-seat pointer-events-none absolute left-1/2 top-3 z-20 -translate-x-1/2 sm:top-5"
         aria-hidden="true"
       >
         <div class="teacher-seat-frame">
-          <p class="teacher-seat-label">講臺 / Teacher Seat</p>
+          <p class="teacher-seat-label">
+            <span class="teacher-seat-label-main">講桌</span>
+            <span class="teacher-seat-label-sub">Teacher Seat</span>
+          </p>
           <span class="teacher-seat-mark" aria-hidden="true"></span>
         </div>
+        <p data-classroom-quote class="classroom-quote" hidden>
+          這就像是我在上課亂跑的樣子
+        </p>
       </div>
 
-      <!-- 老師小人（可拖拽）— 初始於中上 -->
+      <!-- 老師小人（可拖拽）— 初始於左上 -->
       <button
         type="button"
         data-teacher
         class="teacher-figure absolute left-0 top-0 z-40 touch-none select-none"
-        aria-label="Teacher Placeholder，拖到中央講臺讓卡片安靜排好"
+        aria-label="老師，拖到上方講桌讓卡片安靜排好"
       >
-        <svg
-          class="teacher-svg"
-          viewBox="0 0 48 64"
-          width="48"
-          height="64"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <circle cx="24" cy="12" r="8" stroke="#8A6BBE" stroke-width="1.75" fill="#F1EAD7"></circle>
-          <path
-            d="M12 28c0-4 5.5-7 12-7s12 3 12 7v18c0 2-2 4-4 4H16c-2 0-4-2-4-4V28Z"
-            stroke="#8A6BBE"
-            stroke-width="1.75"
-            fill="#F1EAD7"></path>
-          <path d="M18 50v10M30 50v10" stroke="#6E5F4B" stroke-width="1.75" stroke-linecap="square"
-          ></path>
-          <path d="M12 34h-4M36 34h4" stroke="#6E5F4B" stroke-width="1.5" stroke-linecap="square"
-          ></path>
-        </svg>
-        <span class="teacher-caption">Teacher Placeholder</span>
+        <span class="teacher-figure-ring" aria-hidden="true">
+          <svg
+            class="teacher-svg"
+            viewBox="0 0 48 64"
+            width="56"
+            height="74"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <circle cx="24" cy="12" r="8" stroke="#8A6BBE" stroke-width="2" fill="#F1EAD7"></circle>
+            <path
+              d="M12 28c0-4 5.5-7 12-7s12 3 12 7v18c0 2-2 4-4 4H16c-2 0-4-2-4-4V28Z"
+              stroke="#8A6BBE"
+              stroke-width="2"
+              fill="#F1EAD7"></path>
+            <path d="M18 50v10M30 50v10" stroke="#6E5F4B" stroke-width="2" stroke-linecap="square"></path>
+            <path d="M12 34h-4M36 34h4" stroke="#6E5F4B" stroke-width="1.75" stroke-linecap="square"></path>
+          </svg>
+        </span>
+        <span class="teacher-caption">拖我</span>
       </button>
 
       <!-- 聯絡卡片層 -->
@@ -143,55 +149,55 @@ const channels = [
             <article
               data-contact-card
               data-channel={ch.id}
-              class="contact-card absolute left-0 top-0 flex w-[min(85vw,17.25rem)] flex-col border border-beige-dark bg-beige-light p-4 sm:w-[20.25rem] sm:p-5 md:w-[21rem]"
+              class="contact-card absolute left-0 top-0 flex w-[calc(50vw-1.125rem)] max-w-[9.75rem] flex-col border border-beige-dark bg-beige-light p-2.5 sm:w-[20.25rem] sm:max-w-none sm:p-5 md:w-[21rem]"
               style="will-change: transform;"
             >
-              <div class="mb-3 flex items-start justify-between gap-2">
+              <div class="mb-2 flex items-start justify-between gap-1.5 sm:mb-3 sm:gap-2">
                 <span class="contact-card-icon text-purple-focus" aria-hidden="true">
                   {ch.id === 'email' && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="h-6 w-6 sm:h-7 sm:w-7">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="h-5 w-5 sm:h-7 sm:w-7">
                       <rect x="3" y="5" width="18" height="14" rx="1.5" />
                       <path d="m4 7 8 6 8-6" />
                     </svg>
                   )}
                   {ch.id === 'instagram' && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="h-6 w-6 sm:h-7 sm:w-7">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="h-5 w-5 sm:h-7 sm:w-7">
                       <rect x="3.5" y="3.5" width="17" height="17" rx="4.5" />
                       <circle cx="12" cy="12" r="4" />
                       <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
                     </svg>
                   )}
                   {ch.id === 'facebook' && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="h-6 w-6 sm:h-7 sm:w-7">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="h-5 w-5 sm:h-7 sm:w-7">
                       <path d="M14 8h2.5V5H14a4 4 0 0 0-4 4v2H7.5v3H10v7h3v-7h2.3l.7-3H13V9a1 1 0 0 1 1-1Z" />
                     </svg>
                   )}
                   {ch.id === 'discord' && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="h-6 w-6 sm:h-7 sm:w-7">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="h-5 w-5 sm:h-7 sm:w-7">
                       <path d="M7.5 5.5c2-.7 3.8-1 4.5-1s2.5.3 4.5 1l1.2 3.2c1.1.3 2 .8 2.8 1.4-.4 2.1-1.3 4-2.5 5.5-1.3.4-2.7.7-4 .8l-1-1.3h-2l-1 1.3c-1.3-.1-2.7-.4-4-.8C4.8 14.1 3.9 12.2 3.5 10c.8-.6 1.7-1.1 2.8-1.4L7.5 5.5Z" />
                       <circle cx="9.2" cy="11.2" r="1.1" fill="currentColor" stroke="none" />
                       <circle cx="14.8" cy="11.2" r="1.1" fill="currentColor" stroke="none" />
                     </svg>
                   )}
                   {ch.id === 'phone' && (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="h-6 w-6 sm:h-7 sm:w-7">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" class="h-5 w-5 sm:h-7 sm:w-7">
                       <path d="M8.2 3.8h3.1l1.2 3.2-1.8 1.2a11.5 11.5 0 0 0 5.1 5.1l1.2-1.8 3.2 1.2v3.1c0 .8-.6 1.5-1.4 1.6A15.4 15.4 0 0 1 3.8 6.2c.1-.8.8-1.4 1.6-1.4Z" />
                     </svg>
                   )}
                 </span>
-                <span class="label-mono text-xs text-purple-focus sm:text-sm">{ch.label}</span>
+                <span class="label-mono text-[10px] text-purple-focus sm:text-sm">{ch.label}</span>
               </div>
-              <h2 class="mb-1.5 break-all text-base leading-snug text-warm-taupe sm:text-lg">
+              <h2 class="contact-card-title mb-1 break-all text-xs leading-snug text-warm-taupe sm:mb-1.5 sm:text-lg">
                 {ch.title}
               </h2>
-              <p class="label-mono mb-auto text-xs text-warm-taupe/90 sm:text-sm">{ch.meta}</p>
+              <p class="label-mono contact-card-meta mb-auto hidden text-[10px] text-warm-taupe/90 sm:block sm:text-sm">{ch.meta}</p>
 
-              <div class="contact-card-actions mt-3 flex flex-wrap gap-2">
+              <div class="contact-card-actions mt-2 flex flex-wrap gap-1.5 sm:mt-3 sm:gap-2">
                 {(ch.action === 'copy' || ch.action === 'both') && ch.copy && (
                   <button
                     type="button"
                     data-copy={ch.copy}
-                    class="contact-btn inline-flex min-h-11 flex-1 items-center justify-center border border-beige-dark px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-warm-taupe sm:text-xs"
+                    class="contact-btn inline-flex min-h-9 flex-1 items-center justify-center border border-beige-dark px-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-warm-taupe sm:min-h-11 sm:px-2 sm:text-xs"
                   >
                     Copy
                   </button>
@@ -202,7 +208,7 @@ const channels = [
                     data-contact-link
                     target={ch.action === 'link' ? '_blank' : undefined}
                     rel={ch.action === 'link' ? 'noopener noreferrer' : undefined}
-                    class="contact-btn inline-flex min-h-11 flex-1 items-center justify-center border border-beige-dark px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-warm-taupe sm:text-xs"
+                    class="contact-btn inline-flex min-h-9 flex-1 items-center justify-center border border-beige-dark px-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-warm-taupe sm:min-h-11 sm:px-2 sm:text-xs"
                   >
                     {ch.hrefLabel}
                   </a>
@@ -211,7 +217,7 @@ const channels = [
                   <a
                     href={ch.href}
                     data-contact-link
-                    class="contact-btn inline-flex min-h-11 flex-1 items-center justify-center border border-beige-dark px-2 font-mono text-[10px] uppercase tracking-[0.14em] text-warm-taupe sm:text-xs"
+                    class="contact-btn inline-flex min-h-9 flex-1 items-center justify-center border border-beige-dark px-1.5 font-mono text-[9px] uppercase tracking-[0.12em] text-warm-taupe sm:min-h-11 sm:px-2 sm:text-xs"
                   >
                     {ch.hrefLabel}
                   </a>
@@ -258,21 +264,24 @@ const channels = [
   }
 
   .teacher-seat {
-    width: min(42vw, 168px);
+    position: relative;
+    width: min(52vw, 200px);
   }
 
   .teacher-seat-frame {
     position: relative;
+    width: 100%;
     aspect-ratio: 5 / 4;
-    border: 1.5px dashed #d4c4a8;
+    border: 2px dashed #8a6bbe;
     background:
-      linear-gradient(135deg, color-mix(in srgb, #d4c4a8 12%, transparent), transparent 55%),
-      color-mix(in srgb, #f1ead7 70%, transparent);
+      linear-gradient(135deg, color-mix(in srgb, #b6b9ff 18%, transparent), transparent 55%),
+      color-mix(in srgb, #f1ead7 85%, transparent);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    box-shadow: 0 0 0 1px color-mix(in srgb, #8a6bbe 25%, transparent);
     transition:
       border-color 0.25s ease,
       background-color 0.25s ease,
@@ -282,33 +291,73 @@ const channels = [
   .teacher-seat.is-occupied .teacher-seat-frame {
     border-style: solid;
     border-color: #8a6bbe;
-    background: color-mix(in srgb, #b6b9ff 14%, #f1ead7);
-    box-shadow: 0 0 0 1px color-mix(in srgb, #8a6bbe 35%, transparent);
-    opacity: 0.55;
+    background: color-mix(in srgb, #b6b9ff 22%, #f1ead7);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, #8a6bbe 45%, transparent),
+      0 8px 24px color-mix(in srgb, #8a6bbe 16%, transparent);
+    opacity: 1;
   }
 
   .teacher-seat-label {
     margin: 0;
     padding: 0 0.5rem;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .teacher-seat-label-main {
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: #8a6bbe;
+    line-height: 1.1;
+  }
+
+  .teacher-seat-label-sub {
     font-family: 'Space Mono', monospace;
-    font-size: 10px;
+    font-size: 9px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: #6e5f4b;
   }
 
-  .teacher-seat.is-occupied .teacher-seat-label {
+  .teacher-seat.is-occupied .teacher-seat-label-main {
     color: #8a6bbe;
   }
 
-  .teacher-seat-mark {
-    width: 28px;
-    height: 2px;
-    background: #d4c4a8;
+  .classroom-quote {
+    position: absolute;
+    left: calc(100% + 0.65rem);
+    top: 50%;
+    margin: 0;
+    width: max-content;
+    max-width: min(38vw, 11.5rem);
+    padding: 0.5rem 0.65rem;
+    border: 1px solid #d4c4a8;
+    background: color-mix(in srgb, #f1ead7 92%, #b6b9ff 8%);
+    text-align: left;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    letter-spacing: 0.04em;
+    color: #6e5f4b;
+    opacity: 0;
+    transform: translateY(-50%) translateX(-6px);
+    transition:
+      opacity 0.35s ease,
+      transform 0.35s ease;
+    pointer-events: none;
   }
 
-  .teacher-seat.is-occupied .teacher-seat-mark {
+  .classroom-quote:not([hidden]) {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+
+  .teacher-seat-mark {
+    width: 36px;
+    height: 3px;
     background: #8a6bbe;
   }
 
@@ -316,25 +365,64 @@ const channels = [
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
-    padding: 4px;
-    min-width: 56px;
-    min-height: 72px;
+    gap: 6px;
+    padding: 6px;
+    min-width: 72px;
+    min-height: 96px;
     border: none;
     background: transparent;
     cursor: grab;
     touch-action: none;
     will-change: transform;
+    filter: drop-shadow(0 6px 14px color-mix(in srgb, #8a6bbe 22%, transparent));
+  }
+
+  .teacher-figure-ring {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border: 2px solid #8a6bbe;
+    border-radius: 9999px;
+    background: color-mix(in srgb, #b6b9ff 16%, #f1ead7);
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, #b6b9ff 35%, transparent),
+      0 0 18px color-mix(in srgb, #8a6bbe 28%, transparent);
+    animation: teacher-pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes teacher-pulse {
+    0%,
+    100% {
+      box-shadow:
+        0 0 0 3px color-mix(in srgb, #b6b9ff 35%, transparent),
+        0 0 18px color-mix(in srgb, #8a6bbe 28%, transparent);
+    }
+    50% {
+      box-shadow:
+        0 0 0 6px color-mix(in srgb, #b6b9ff 18%, transparent),
+        0 0 28px color-mix(in srgb, #8a6bbe 38%, transparent);
+    }
   }
 
   .teacher-figure:focus-visible {
     outline: 2px solid #8a6bbe;
-    outline-offset: 3px;
+    outline-offset: 4px;
   }
 
   .teacher-figure.is-dragging {
     cursor: grabbing;
     z-index: 50;
+  }
+
+  .teacher-figure.is-dragging .teacher-figure-ring {
+    animation: none;
+  }
+
+  .teacher-figure.is-seated .teacher-figure-ring {
+    animation: none;
+    border-color: #8a6bbe;
+    background: color-mix(in srgb, #b6b9ff 28%, #f1ead7);
   }
 
   .teacher-figure.is-seated .teacher-svg circle,
@@ -343,18 +431,19 @@ const channels = [
   }
 
   .teacher-caption {
-    max-width: 4.5rem;
+    max-width: 3.5rem;
     text-align: center;
     font-family: 'Space Mono', monospace;
-    font-size: 8px;
+    font-size: 10px;
+    font-weight: 600;
     line-height: 1.35;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #6e5f4b;
+    color: #8a6bbe;
   }
 
   .contact-card {
-    border-radius: 1rem;
+    border-radius: 0.75rem;
     box-shadow:
       0 1px 0 color-mix(in srgb, #d4c4a8 40%, transparent),
       0 4px 0 #d4c4a8;
@@ -426,8 +515,28 @@ const channels = [
   @media (prefers-reduced-motion: reduce) {
     .teacher-seat-frame,
     .contact-btn,
-    .contact-toast {
+    .contact-toast,
+    .classroom-quote,
+    .teacher-figure-ring {
+      animation: none;
       transition: none;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .teacher-seat-label-main {
+      font-size: 1.25rem;
+    }
+
+    .classroom-quote {
+      left: calc(100% + 0.85rem);
+      max-width: 14rem;
+      font-size: 0.875rem;
+      padding: 0.55rem 0.75rem;
+    }
+
+    .contact-card {
+      border-radius: 1rem;
     }
   }
 </style>
